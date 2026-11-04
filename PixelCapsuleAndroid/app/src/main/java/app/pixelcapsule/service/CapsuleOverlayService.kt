@@ -46,8 +46,8 @@ class CapsuleOverlayService : Service() {
                 Intent.ACTION_BATTERY_CHANGED -> updateBattery(intent)
                 BluetoothDevice.ACTION_ACL_CONNECTED -> CapsuleRuntime.setBluetoothConnected(true)
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> CapsuleRuntime.setBluetoothConnected(false)
-                BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED -> {
-                    val percent = intent.getIntExtra(BluetoothDevice.EXTRA_BATTERY_LEVEL, -1)
+                ACTION_BLUETOOTH_BATTERY_LEVEL_CHANGED -> {
+                    val percent = intent.getIntExtra(EXTRA_BLUETOOTH_BATTERY_LEVEL, -1)
                     CapsuleRuntime.setBluetoothBatteryPercent(percent.takeIf { it in 0..100 })
                 }
             }
@@ -270,6 +270,8 @@ class CapsuleOverlayService : Service() {
         const val ACTION_STOP = "app.pixelcapsule.action.STOP_OVERLAY"
         private const val CHANNEL_ID = "pixel_capsule_overlay"
         private const val NOTIFICATION_ID = 4242
+        private const val ACTION_BLUETOOTH_BATTERY_LEVEL_CHANGED = "android.bluetooth.device.action.BATTERY_LEVEL_CHANGED"
+        private const val EXTRA_BLUETOOTH_BATTERY_LEVEL = "android.bluetooth.device.extra.BATTERY_LEVEL"
     }
 }
 
