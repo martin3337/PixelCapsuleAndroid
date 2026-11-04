@@ -185,7 +185,9 @@ fun CapsuleOverlayUi(
                         call = snapshot.call,
                         battery = snapshot.batteryPercent,
                         charging = snapshot.isCharging,
+                        chargingSource = snapshot.chargingSource,
                         bluetoothConnected = snapshot.bluetoothConnected,
+                        bluetoothBatteryPercent = snapshot.bluetoothBatteryPercent,
                         downloadPercent = snapshot.downloadPercent,
                         quickApps = snapshot.quickApps,
                         onFocusableChanged = onFocusableChanged,
@@ -305,7 +307,9 @@ private fun ExpandedCapsule(
     call: CallInfo,
     battery: Int,
     charging: Boolean,
+    chargingSource: String,
     bluetoothConnected: Boolean,
+    bluetoothBatteryPercent: Int?,
     downloadPercent: Int?,
     quickApps: Set<String>,
     onFocusableChanged: (Boolean) -> Unit,
@@ -374,7 +378,7 @@ private fun ExpandedCapsule(
             }
         }
         when (section) {
-            CapsuleSection.OVERVIEW -> OverviewPanel(snapshotMedia, notifications, battery, charging, bluetoothConnected, downloadPercent, green, muted)
+            CapsuleSection.OVERVIEW -> OverviewPanel(snapshotMedia, notifications, battery, charging, chargingSource, bluetoothConnected, bluetoothBatteryPercent, downloadPercent, green, muted)
             CapsuleSection.MEDIA -> MediaPanel(snapshotMedia, green, muted)
             CapsuleSection.NOTIFICATIONS -> NotificationsPanel(notifications, onFocusableChanged, muted)
             CapsuleSection.CONTROLS -> ControlsPanel(green, muted)
@@ -425,7 +429,8 @@ private fun CallCard(call: CallInfo, green: Color) {
 @Composable
 private fun OverviewPanel(
     media: MediaInfo?, notifications: List<NotificationInfo>, battery: Int, charging: Boolean,
-    bluetoothConnected: Boolean, downloadPercent: Int?, green: Color, muted: Color
+    chargingSource: String, bluetoothConnected: Boolean, bluetoothBatteryPercent: Int?,
+    downloadPercent: Int?, green: Color, muted: Color
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (media != null) {
@@ -439,8 +444,28 @@ private fun OverviewPanel(
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            StatusTile("Batéria", if (battery >= 0) "$battery%" else "—", if (charging) Icons.Default.BatteryChargingFull else Icons.Default.BatteryChargingFull, Modifier.weight(1f), green)
-            StatusTile("Bluetooth", if (bluetoothConnected) "Pripojené" else "Odpojené", Icons.Default.Bluetooth, Modifier.weight(1f), green)
+            StatusTile(
+                "Batéria",
+                when {
+                    battery < 0 -> "—"
+                    charging -> "$battery% • $chargingSource"
+                    else -> "$battery%"
+                },
+                Icons.Default.BatteryChargingFull,
+                Modifier.weight(1f),
+                green
+            )
+            StatusTile(
+                "Bluetooth",
+                when {
+                    !bluetoothConnected -> "Odpojené"
+                    bluetoothBatteryPercent != null -> "Pripojené • $bluetoothBatteryPercent%"
+                    else -> "Pripojené"
+                },
+                Icons.Default.Bluetooth,
+                Modifier.weight(1f),
+                green
+            )
         }
         if (downloadPercent != null) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
