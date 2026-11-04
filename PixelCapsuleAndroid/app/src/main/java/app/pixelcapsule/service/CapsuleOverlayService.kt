@@ -28,10 +28,10 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.SavedStateRegistryController
-import androidx.savedstate.ViewTreeSavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import app.pixelcapsule.MainActivity
 import app.pixelcapsule.R
 import app.pixelcapsule.core.CapsulePrefs
@@ -140,8 +140,8 @@ class CapsuleOverlayService : Service(), LifecycleOwner, SavedStateRegistryOwner
         val view = ComposeView(this).apply {
             // ComposeView outside an Activity/Fragment requires both tree owners.
             // Missing either owner causes a crash while the overlay composition is created.
-            ViewTreeLifecycleOwner.set(this, this@CapsuleOverlayService)
-            ViewTreeSavedStateRegistryOwner.set(this, this@CapsuleOverlayService)
+            setViewTreeLifecycleOwner(this@CapsuleOverlayService)
+            setViewTreeSavedStateRegistryOwner(this@CapsuleOverlayService)
             setContent {
                 PixelCapsuleTheme(dynamicColors = prefs.dynamicColors) {
                     CapsuleOverlayUi(
