@@ -1,6 +1,8 @@
 package app.pixelcapsule.ui
 
 import android.media.AudioManager
+import android.content.Intent
+import android.net.Uri
 import android.os.SystemClock
 import android.widget.Toast
 import androidx.compose.animation.AnimatedContent
@@ -98,7 +100,7 @@ import kotlinx.coroutines.delay
 import kotlin.math.abs
 
 private enum class CapsuleSection(val label: String) {
-    OVERVIEW("Prehľad"), MEDIA("Hudba"), NOTIFICATIONS("Upozornenia"), CONTROLS("Ovládanie"), APPS("Aplikácie")
+    OVERVIEW("Prehľad"), MEDIA("Hudba"), NOTIFICATIONS("Upozornenia"), CONTROLS("Ovládanie"), APPS("Aplikácie"), CONTACTS("Kontakty")
 }
 
 @Composable
@@ -112,6 +114,18 @@ fun CapsuleOverlayUi(
     LaunchedEffect(Unit) { CapsuleRuntime.setQuickApps(preferences.quickApps) }
     var expanded by remember { mutableStateOf(false) }
     var section by remember { mutableStateOf(CapsuleSection.OVERVIEW) }
+    fun performGesture(action: String) {
+        when (action) {
+            "toggle" -> expanded = !expanded
+            "expand" -> expanded = true
+            "collapse" -> expanded = false
+            "settings" -> onOpenSettings()
+            "media" -> { section = CapsuleSection.MEDIA; expanded = true }
+            "notifications" -> { section = CapsuleSection.NOTIFICATIONS; expanded = true }
+            "next_section" -> { val all = CapsuleSection.entries; section = all[(all.indexOf(section) + 1) % all.size]; expanded = true }
+            "previous_section" -> { val all = CapsuleSection.entries; section = all[(all.indexOf(section) - 1 + all.size) % all.size]; expanded = true }
+        }
+    }
     val targetWidth = if (expanded) preferences.expandedWidthDp.dp else preferences.widthDp.dp
     val width by animateDpAsState(targetValue = targetWidth, animationSpec = spring(dampingRatio = 0.78f, stiffness = 420f), label = "capsule-width")
     val radius by animateDpAsState(
@@ -121,7 +135,7 @@ fun CapsuleOverlayUi(
     val bg = Color(0xFF111713)
     val fg = Color(0xFFF4F6EE)
     val muted = Color(0xFFB4C0AE)
-    val green = Color(0xFFB9D69A)
+    val green = Color(preferences.accentColorArgb)
 
     Box(modifier = Modifier.width(width).widthIn(min = 104.dp, max = 420.dp)) {
         Surface(
@@ -133,13 +147,9 @@ fun CapsuleOverlayUi(
                 .fillMaxWidth()
                 .clip(RoundedCornerShape(radius))
                 .combinedClickable(
-                    onClick = { expanded = !expanded },
-                    onDoubleClick = {
-                        val all = CapsuleSection.entries
-                        section = all[(all.indexOf(section) + 1) % all.size]
-                        expanded = true
-                    },
-                    onLongClick = onOpenSettings
+                    onClick = { performGesture(preferences.tapAction) },
+                    onDoubleClick = { performGesture(preferences.doubleTapAction) },
+                    onLongClick = { performGesture(preferences.longPressAction) }
                 )
         ) {
             AnimatedContent(targetState = expanded, label = "capsule-expand") { isExpanded ->
@@ -152,13 +162,8 @@ fun CapsuleOverlayUi(
                         fg = fg,
                         muted = muted,
                         green = green,
-                        onSwipeHorizontal = { delta ->
-                            val all = CapsuleSection.entries
-                            val direction = if (delta < 0f) 1 else -1
-                            section = all[(all.indexOf(section) + direction + all.size) % all.size]
-                            expanded = true
-                        },
-                        onSwipeUp = { expanded = true }
+                        onSwipeHorizontal = { delta -> performGesture(if (delta < 0f) preferences.swipeLeftAction else preferences.swipeRightAction) },
+                        onSwipeUp = { performGesture(preferences.swipeUpAction) }
                     )
                 } else {
                     ExpandedCapsule(
@@ -175,12 +180,8 @@ fun CapsuleOverlayUi(
                         onFocusableChanged = onFocusableChanged,
                         onCollapse = { expanded = false },
                         onOpenSettings = onOpenSettings,
-                        onSwipeHorizontal = { delta ->
-                            val all = CapsuleSection.entries
-                            val direction = if (delta < 0f) 1 else -1
-                            section = all[(all.indexOf(section) + direction + all.size) % all.size]
-                        },
-                        onSwipeDown = { expanded = false },
+                        onSwipeHorizontal = { delta -> performGesture(if (delta < 0f) preferences.swipeLeftAction else preferences.swipeRightAction) },
+                        onSwipeDown = { performGesture(preferences.swipeDownAction) },
                         green = green,
                         muted = muted,
                         fg = fg
@@ -326,6 +327,7 @@ private fun ExpandedCapsule(
                         section == CapsuleSection.NOTIFICATIONS -> "Upozornenia"
                         section == CapsuleSection.CONTROLS -> "Rýchle ovládače"
                         section == CapsuleSection.APPS -> "Obľúbené aplikácie"
+                        section == CapsuleSection.CONTACTS -> "Kontakty"
                         else -> "Tvoj okamžitý prehľad"
                     },
                     color = fg, fontWeight = FontWeight.SemiBold, fontSize = 15.sp
@@ -349,6 +351,7 @@ private fun ExpandedCapsule(
                                 CapsuleSection.NOTIFICATIONS -> Icons.Default.Notifications
                                 CapsuleSection.CONTROLS -> Icons.Default.Brightness6
                                 CapsuleSection.APPS -> Icons.Default.Apps
+                                CapsuleSection.CONTACTS -> Icons.Default.Call
                                 CapsuleSection.OVERVIEW -> Icons.Default.Bolt
                             }, null, modifier = Modifier.size(14.dp)
                         )
@@ -362,6 +365,7 @@ private fun ExpandedCapsule(
             CapsuleSection.NOTIFICATIONS -> NotificationsPanel(notifications, onFocusableChanged, muted)
             CapsuleSection.CONTROLS -> ControlsPanel(green, muted)
             CapsuleSection.APPS -> FavouriteAppsPanel(muted, quickApps)
+            CapsuleSection.CONTACTS -> ContactsPanel(muted)
         }
         Text("Potiahni do strán na prepnutie • podrž na nastavenia", color = muted, fontSize = 9.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
     }
@@ -653,6 +657,28 @@ private fun VolumeSlider(title: String, value: Float, onChange: (Float) -> Unit,
             Text("${value.toInt()}%", color = muted, fontSize = 10.sp)
         }
         Slider(value = value, onValueChange = onChange, onValueChangeFinished = onFinished, valueRange = 0f..100f, modifier = Modifier.height(26.dp))
+    }
+}
+
+@Composable
+private fun ContactsPanel(muted: Color) {
+    val context = LocalContext.current
+    var entries by remember { mutableStateOf(CapsulePrefs.read(context).contacts) }
+    val contacts = entries.mapNotNull { raw -> val parts = raw.split('|', limit = 2); if (parts.size == 2) parts[0] to parts[1] else null }
+    if (contacts.isEmpty()) {
+        Text("Zatiaľ nemáš pridané kontakty. V aplikácii Pixel Capsule vyber možnosť Pridať kontakt do kapsuly.", color = muted, fontSize = 11.sp)
+        return
+    }
+    Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
+        contacts.forEach { (uri, name) ->
+            Surface(onClick = { runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(uri)).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) } }, shape = RoundedCornerShape(16.dp), color = Color(0xFF202A22)) {
+                Row(Modifier.fillMaxWidth().padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Call, null, tint = Color(0xFFB9D69A), modifier = Modifier.size(18.dp))
+                    Text(name, color = Color.White, modifier = Modifier.weight(1f).padding(start = 10.dp), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
+                    TextButton(onClick = { CapsulePrefs.removeContact(context, uri); entries = CapsulePrefs.read(context).contacts }) { Text("Odobrať", color = muted, fontSize = 9.sp) }
+                }
+            }
+        }
     }
 }
 

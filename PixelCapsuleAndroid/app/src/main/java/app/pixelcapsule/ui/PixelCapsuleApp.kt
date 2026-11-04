@@ -56,6 +56,7 @@ fun PixelCapsuleApp(
     onStopOverlay: () -> Unit,
     onRequestCallPermissions: () -> Unit,
     onRequestCameraPermission: () -> Unit,
+    onPickContact: () -> Unit,
     permissionRefreshKey: Int
 ) {
     val context = LocalContext.current
@@ -70,6 +71,7 @@ fun PixelCapsuleApp(
                 onPermissions = { page = AppPage.PERMISSIONS },
                 onRequestCallPermissions = onRequestCallPermissions,
                 onRequestCameraPermission = onRequestCameraPermission,
+                onPickContact = onPickContact,
                 permissionRefreshKey = permissionRefreshKey
             )
             AppPage.SETTINGS -> SettingsScreen(onBack = { page = AppPage.HOME }, onRestartOverlay = onStartOverlay)
@@ -95,6 +97,7 @@ private fun HomeScreen(
     onPermissions: () -> Unit,
     onRequestCallPermissions: () -> Unit,
     onRequestCameraPermission: () -> Unit,
+    onPickContact: () -> Unit,
     permissionRefreshKey: Int
 ) {
     val context = LocalContext.current
@@ -133,6 +136,12 @@ private fun HomeScreen(
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
             QuickActionCard("Vzhľad", "Poloha, veľkosť a farby", Icons.Default.Tune, onSettings, Modifier.weight(1f))
             QuickActionCard("Aplikácie", "Tvoje obľúbené skratky", Icons.Default.Apps, onApps, Modifier.weight(1f))
+        }
+
+        OutlinedButton(onClick = onPickContact, modifier = Modifier.fillMaxWidth()) {
+            Icon(Icons.Default.Apps, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(Modifier.size(8.dp))
+            Text("Pridať kontakt do kapsuly")
         }
 
         Text("Oprávnenia", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
