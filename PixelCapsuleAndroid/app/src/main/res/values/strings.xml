@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">Pixel Capsule</string>
     <string name="overlay_channel_name">Pixel Capsule</string>
-    <string name="overlay_channel_description">Stav a ovládanie plávajúcej kapsuly</string>
-    <string name="overlay_running">Pixel Capsule je aktívna</string>
+    <string name="overlay_channel_description">Floating capsule status and controls</string>
+    <string name="overlay_running">Pixel Capsule is active</string>
+    <string name="overlay_notification_text">Tap to open Pixel Capsule settings</string>
+    <string name="turn_off">Turn off</string>
 </resources>
