@@ -22,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.pixelcapsule.core.CapsulePrefs
@@ -35,10 +36,10 @@ fun AppsScreen(onBack: () -> Unit) {
     val launchableApps = remember { AppCatalog.installedLauncherApps(context) }
     var favourites by remember { mutableStateOf(CapsulePrefs.read(context).quickApps) }
     Column(modifier = Modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        TextButton(onClick = onBack) { Text("← Späť") }
-        Text("Rýchle aplikácie", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        Text("Vyber aplikácie, ktoré chceš mať po ruke v rozbalenej kapsule. Zobrazujú sa spustiteľné aplikácie; Android obmedzuje prístup k skrytým balíkom.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text("Vybrané: ${favourites.size}", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+        TextButton(onClick = onBack) { Text(stringResource(R.string.back_arrow)) }
+        Text(stringResource(R.string.quick_apps_title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.quick_apps_desc), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(stringResource(R.string.selected_count, favourites.size), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(launchableApps, key = { it.packageName }) { app ->
                 AppChoiceRow(app, favourites.contains(app.packageName)) { checked ->
