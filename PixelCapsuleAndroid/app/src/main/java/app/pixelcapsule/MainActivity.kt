@@ -6,6 +6,7 @@ import android.os.Build
 import android.net.Uri
 import android.provider.Settings
 import android.provider.ContactsContract
+import android.widget.Toast
 import app.pixelcapsule.core.CapsulePrefs
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -64,7 +65,15 @@ class MainActivity : ComponentActivity() {
             return
         }
         val intent = Intent(this, CapsuleOverlayService::class.java).setAction(CapsuleOverlayService.ACTION_START)
-        ContextCompat.startForegroundService(this, intent)
+        runCatching {
+            ContextCompat.startForegroundService(this, intent)
+        }.onFailure { error ->
+            Toast.makeText(
+                this,
+                "Could not start Pixel Capsule: ${error.localizedMessage ?: error.javaClass.simpleName}",
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     private fun requestCallPermissions() {
