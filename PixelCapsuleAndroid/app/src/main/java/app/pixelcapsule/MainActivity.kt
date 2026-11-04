@@ -2,6 +2,7 @@ package app.pixelcapsule
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Build
 import android.net.Uri
 import android.provider.Settings
 import android.provider.ContactsContract
@@ -44,6 +45,7 @@ class MainActivity : ComponentActivity() {
                     onStopOverlay = { stopService(Intent(this, CapsuleOverlayService::class.java)) },
                     onRequestCallPermissions = { requestCallPermissions() },
                     onRequestCameraPermission = { requestCameraPermission() },
+                    onRequestBluetoothPermission = { requestBluetoothPermission() },
                     onPickContact = { contactPicker.launch(null) },
                     permissionRefreshKey = permissionRefresh
                 )
@@ -76,6 +78,12 @@ class MainActivity : ComponentActivity() {
 
     private fun requestCameraPermission() {
         permissionResult.launch(arrayOf(android.Manifest.permission.CAMERA))
+    }
+
+    private fun requestBluetoothPermission() {
+        if (Build.VERSION.SDK_INT >= 31) {
+            permissionResult.launch(arrayOf(android.Manifest.permission.BLUETOOTH_CONNECT))
+        }
     }
 
     companion object {
