@@ -3,6 +3,8 @@ package app.pixelcapsule
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.provider.ContactsContract
+import app.pixelcapsule.core.CapsulePrefs
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.getValue
@@ -17,6 +19,20 @@ import app.pixelcapsule.ui.PixelCapsuleTheme
 class MainActivity : ComponentActivity() {
     private var permissionRefresh by mutableIntStateOf(0)
     private val permissionResult = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { }
+    private val contactPicker = registerForActivityResult(ActivityResultContracts.PickContact()) { uri ->
+        if (uri != null) {
+            val contact = contentResolver.query(uri, arrayOf(ContactsContract.Contacts.DISPLAY_NAME, ContactsContract.Contacts._ID), null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) cursor.getString(0) to cursor.getString(1) else "Kontakt" to null
+            } ?: ("Kontakt" to null)
+            val phone = contact.second?.let { contactId ->
+                contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, arrayOf(ContactsContract.CommonDataKinds.Phone.NUMBER), ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?", arrayOf(contactId), null)?.use { cursor ->
+                    if (cursor.moveToFirst()) cursor.getString(0) else null
+                }
+            }
+            val shortcutUri = phone?.let { Uri.fromParts("tel", it, null).toString() } ?: uri.toString()
+            CapsulePrefs.addContact(this, shortcutUri, contact.first)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,6 +43,7 @@ class MainActivity : ComponentActivity() {
                     onStopOverlay = { stopService(Intent(this, CapsuleOverlayService::class.java)) },
                     onRequestCallPermissions = { requestCallPermissions() },
                     onRequestCameraPermission = { requestCameraPermission() },
+                    onPickContact = { contactPicker.launch(null) },
                     permissionRefreshKey = permissionRefresh
                 )
             }
