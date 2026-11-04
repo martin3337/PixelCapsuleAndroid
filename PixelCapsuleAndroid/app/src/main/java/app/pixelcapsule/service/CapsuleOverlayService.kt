@@ -29,6 +29,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.ViewTreeSavedStateRegistryOwner
 import app.pixelcapsule.MainActivity
 import app.pixelcapsule.R
 import app.pixelcapsule.core.CapsulePrefs
@@ -36,9 +39,11 @@ import app.pixelcapsule.core.CapsuleRuntime
 import app.pixelcapsule.ui.CapsuleOverlayUi
 import app.pixelcapsule.ui.PixelCapsuleTheme
 
-class CapsuleOverlayService : Service(), LifecycleOwner {
-    private val serviceLifecycle by lazy { LifecycleRegistry(this) }
+class CapsuleOverlayService : Service(), LifecycleOwner, SavedStateRegistryOwner {
+    private val serviceLifecycle = LifecycleRegistry(this)
+    private val savedStateController = SavedStateRegistryController.create(this)
     override val lifecycle: Lifecycle get() = serviceLifecycle
+    override val savedStateRegistry get() = savedStateController.savedStateRegistry
     private lateinit var windowManager: WindowManager
     private var overlayView: ComposeView? = null
     private var overlayParams: LayoutParams? = null
@@ -62,13 +67,14 @@ class CapsuleOverlayService : Service(), LifecycleOwner {
 
     override fun onCreate() {
         super.onCreate()
-        serviceLifecycle.currentState = Lifecycle.State.CREATED
+        savedStateController.performAttach()
+        savedStateController.performRestore(null)
+        serviceLifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         createNotificationChannel()
         startAsForeground()
         registerDeviceReceivers()
         registerPhoneState()
-        serviceLifecycle.currentState = Lifecycle.State.STARTED
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -83,7 +89,13 @@ class CapsuleOverlayService : Service(), LifecycleOwner {
         registerDeviceReceivers()
         if (phoneListener == null && telephonyCallback == null) registerPhoneState()
         if (overlayView != null) removeOverlay()
+        serviceLifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        serviceLifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
         addOverlay()
+        if (overlayView == null) {
+            serviceLifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+            serviceLifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        }
         return START_STICKY
     }
 
@@ -126,9 +138,10 @@ class CapsuleOverlayService : Service(), LifecycleOwner {
     private fun addOverlay() {
         val prefs = CapsulePrefs.read(this)
         val view = ComposeView(this).apply {
-            // Service views have no Activity decor tree. Attach an explicit lifecycle owner
-            // before Compose creates its composition to avoid an overlay attach crash.
+            // ComposeView outside an Activity/Fragment requires both tree owners.
+            // Missing either owner causes a crash while the overlay composition is created.
             ViewTreeLifecycleOwner.set(this, this@CapsuleOverlayService)
+            ViewTreeSavedStateRegistryOwner.set(this, this@CapsuleOverlayService)
             setContent {
                 PixelCapsuleTheme(dynamicColors = prefs.dynamicColors) {
                     CapsuleOverlayUi(
@@ -184,9 +197,16 @@ class CapsuleOverlayService : Service(), LifecycleOwner {
     }
 
     private fun removeOverlay() {
-        overlayView?.let { view -> runCatching { windowManager.removeView(view) } }
-        overlayView = null
-        overlayParams = null
+        val view = overlayView
+        if (view != null) {
+            runCatching { windowManager.removeView(view) }
+            overlayView = null
+            overlayParams = null
+            if (serviceLifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                serviceLifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+                serviceLifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+            }
+        }
     }
 
     private fun setOverlayFocusable(focusable: Boolean) {
@@ -260,8 +280,10 @@ class CapsuleOverlayService : Service(), LifecycleOwner {
     private fun dp(value: Float): Int = (value * resources.displayMetrics.density).toInt()
 
     override fun onDestroy() {
-        serviceLifecycle.currentState = Lifecycle.State.DESTROYED
         removeOverlay()
+        if (serviceLifecycle.currentState != Lifecycle.State.DESTROYED) {
+            serviceLifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        }
         if (receiverRegistered) runCatching { unregisterReceiver(stateReceiver) }
         receiverRegistered = false
         val manager = getSystemService(TELEPHONY_SERVICE) as TelephonyManager
