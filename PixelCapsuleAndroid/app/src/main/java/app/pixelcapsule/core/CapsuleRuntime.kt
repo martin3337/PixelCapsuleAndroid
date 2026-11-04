@@ -99,12 +99,29 @@ object CapsuleRuntime {
         }
     }
 
-    fun setBattery(level: Int, charging: Boolean) {
-        mutableState.update { it.copy(batteryPercent = level.coerceIn(0, 100), isCharging = charging) }
+    fun setBattery(level: Int, charging: Boolean, source: String = "") {
+        mutableState.update {
+            it.copy(
+                batteryPercent = level.coerceIn(0, 100),
+                isCharging = charging,
+                chargingSource = if (charging) source else ""
+            )
+        }
     }
 
     fun setBluetoothConnected(connected: Boolean) {
-        mutableState.update { it.copy(bluetoothConnected = connected) }
+        mutableState.update {
+            it.copy(
+                bluetoothConnected = connected,
+                bluetoothBatteryPercent = if (connected) it.bluetoothBatteryPercent else null
+            )
+        }
+    }
+
+    fun setBluetoothBatteryPercent(percent: Int?) {
+        mutableState.update {
+            it.copy(bluetoothBatteryPercent = percent?.takeIf { value -> value in 0..100 })
+        }
     }
 
     fun setQuickApps(packages: Set<String>) {
