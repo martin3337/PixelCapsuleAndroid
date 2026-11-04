@@ -100,4 +100,7 @@
     <string name="gesture_swipe_up">Potiahnutie hore</string>
     <string name="gesture_swipe_down">Potiahnutie dole</string>
     <string name="overlay_note">Poznámka: Android vykresľuje systémový stavový riadok nad prekryvnými oknami aplikácií. Kapsula sa zarovnáva podľa výrezu a zostáva v dostupnej oblasti; nemôže nahradiť systémový stavový riadok.</string>
+    <string name="quick_apps_title">Rýchle aplikácie</string>
+    <string name="quick_apps_desc">Vyber aplikácie, ktoré chceš mať po ruke v rozbalenej kapsule. Zobrazujú sa spustiteľné aplikácie; Android obmedzuje prístup k skrytým balíkom.</string>
+    <string name="selected_count">Vybrané: %1$d</string>
 </resources>
