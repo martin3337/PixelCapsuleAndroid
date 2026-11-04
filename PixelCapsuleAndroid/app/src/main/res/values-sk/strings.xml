@@ -178,4 +178,27 @@
     <string name="remove">Odobrať</string>
     <string name="no_favourite_apps">Zatiaľ nemáš vybrané skratky. Otvor nastavenia a pridaj aplikácie do kapsuly.</string>
     <string name="back_arrow">Späť</string>
+    <string name="flashlight_first_use">Vyžaduje povolenie fotoaparátu iba pri prvom zapnutí blesku.</string>
+    <string name="bluetooth_permission_desc">Voliteľné povolenie na zobrazenie úrovne batérie podporovaných slúchadiel a zariadení.</string>
+    <string name="notifications_permission_detail">Texty upozornení a akcie rýchlej odpovede.</string>
+    <string name="phone_permission_detail">Stav SIM hovoru; pri prijatí/odmietnutí je potrebné samostatné povolenie.</string>
+    <string name="accessibility_detail">AccessibilityService sa nevyžaduje. Kapsula používa vlastné dotykové gestá a samostatné systémové rozhrania.</string>
+    <string name="settings_intro_full">Jemne dolaď polohu, rozmery a obsah kapsuly. Poloha výrezu sa zisťuje z geometrie displeja automaticky.</string>
+    <string name="qr_widget_desc_full">Vlož text alebo odkaz. Kapsula z neho vytvorí QR kód; v kapsule ho môžeš skopírovať alebo otvoriť odkaz.</string>
+    <string name="gestures_desc_full">Nastav akciu pre ťuknutie, dvojité ťuknutie, podržanie a všetky smery potiahnutia.</string>
+    <string name="overlay_note_full">Poznámka: Android vykresľuje systémový stavový riadok nad aplikačnými overlay oknami. Kapsula sa preto zarovnáva podľa výrezu a zobrazuje sa v jeho dostupnej oblasti; nemôže nahradiť systémový stavový riadok.</string>
+    <string name="overview_title">Tvoj okamžitý prehľad</string>
+    <string name="connected_percent">Pripojené • %1$d%%</string>
+    <string name="download_progress">Sťahovanie • %1$d%%</string>
+    <string name="empty_notifications">Zatiaľ tu nie sú žiadne upozornenia. Po zapnutí prístupu k notifikáciám sa zobrazia nové udalosti.</string>
+    <string name="torch_failed">Baterku sa nepodarilo ovládať</string>
+    <string name="auto_brightness_failed">Zmena automatického jasu zlyhala</string>
+    <string name="system_panel_description_full">Otvára systémové panely Androidu. Dostupnosť konkrétneho panela závisí od verzie a výrobcu telefónu.</string>
+    <string name="qr_title_short">Vlastný QR kód</string>
+    <string name="empty_favourite_apps">Zatiaľ nemáš vybrané skratky. Dlhým podržaním kapsuly otvor nastavenia a pridaj aplikácie.</string>
+    <string name="charging_adapter">Adaptér</string>
+    <string name="charging_wireless">Bezdrôtovo</string>
+    <string name="charging_source">Napájanie</string>
+    <string name="previous">Predchádzajúca</string>
+    <string name="next">Ďalšia</string>
 </resources>
