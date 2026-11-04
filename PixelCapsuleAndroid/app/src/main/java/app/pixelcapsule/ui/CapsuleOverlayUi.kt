@@ -1,6 +1,7 @@
 package app.pixelcapsule.ui
 
 import android.media.AudioManager
+import android.media.audiofx.AudioEffect
 import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
@@ -541,6 +542,22 @@ private fun MediaPanel(media: MediaInfo?, green: Color, muted: Color) {
             Icon(if (media.playing) Icons.Default.Pause else Icons.Default.PlayArrow, "Prehrať alebo pozastaviť", tint = green, modifier = Modifier.size(34.dp))
         }
         IconButton(onClick = { controller?.transportControls?.skipToNext() }) { Icon(Icons.Default.SkipNext, "Ďalšia", tint = Color.White, modifier = Modifier.size(28.dp)) }
+    }
+    val context = LocalContext.current
+    TextButton(onClick = {
+        val intent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL).apply {
+            putExtra(AudioEffect.EXTRA_PACKAGE_NAME, context.packageName)
+            putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
+        }
+        if (intent.resolveActivity(context.packageManager) != null) {
+            runCatching { context.startActivity(intent) }.onFailure {
+                Toast.makeText(context, "Ekvalizér sa nepodarilo otvoriť.", Toast.LENGTH_SHORT).show()
+            }
+        } else {
+            Toast.makeText(context, "Tvoje zariadenie neposkytuje systémový ekvalizér.", Toast.LENGTH_SHORT).show()
+        }
+    }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+        Text("Otvoriť ekvalizér zvuku", color = green, fontSize = 10.sp)
     }
 }
 
