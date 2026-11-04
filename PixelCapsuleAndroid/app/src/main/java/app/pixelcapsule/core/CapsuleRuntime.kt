@@ -21,6 +21,17 @@ object CapsuleRuntime {
     var activeMediaController: MediaController? = null
         private set
 
+    @Volatile
+    private var notificationDismissHandler: ((String) -> Unit)? = null
+
+    fun setNotificationDismissHandler(handler: ((String) -> Unit)?) {
+        notificationDismissHandler = handler
+    }
+
+    fun dismissNotification(key: String) {
+        notificationDismissHandler?.invoke(key)
+    }
+
     private val actionLock = Any()
     private val notificationActions = LinkedHashMap<String, Array<Notification.Action>>()
     private val notificationIntents = LinkedHashMap<String, PendingIntent>()
