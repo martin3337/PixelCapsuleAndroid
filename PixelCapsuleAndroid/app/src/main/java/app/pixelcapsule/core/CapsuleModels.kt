@@ -71,6 +71,7 @@ data class OverlayPreferences(
     val showApps: Boolean = true,
     val quickApps: Set<String> = emptySet(),
     val contacts: Set<String> = emptySet(),
+    val widgetText: String = "",
     val accentColorArgb: Long = 0xFFB9D69A,
     val tapAction: String = "toggle",
     val doubleTapAction: String = "next_section",
