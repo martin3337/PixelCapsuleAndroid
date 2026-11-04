@@ -54,8 +54,6 @@ data class CapsuleUiState(
     val quickApps: Set<String> = emptySet()
 )
 
-data class ContactShortcut(val uri: String, val name: String)
-
 data class OverlayPreferences(
     val widthDp: Float = 154f,
     val expandedWidthDp: Float = 356f,
@@ -67,16 +65,7 @@ data class OverlayPreferences(
     val showNotifications: Boolean = true,
     val showControls: Boolean = true,
     val showApps: Boolean = true,
-    val quickApps: Set<String> = emptySet(),
-    val contacts: Set<String> = emptySet(),
-    val accentColorArgb: Long = 0xFFB9D69A,
-    val tapAction: String = "toggle",
-    val doubleTapAction: String = "next_section",
-    val longPressAction: String = "settings",
-    val swipeLeftAction: String = "next_section",
-    val swipeRightAction: String = "previous_section",
-    val swipeUpAction: String = "expand",
-    val swipeDownAction: String = "collapse"
+    val quickApps: Set<String> = emptySet()
 )
 
 fun formatDuration(milliseconds: Long): String {
