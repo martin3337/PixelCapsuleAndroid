@@ -201,4 +201,5 @@
     <string name="charging_source">Napájanie</string>
     <string name="previous">Predchádzajúca</string>
     <string name="next">Ďalšia</string>
+    <string name="notification_listener_label">Pixel Capsule – notifikácie a médiá</string>
 </resources>
