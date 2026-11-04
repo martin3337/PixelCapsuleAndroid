@@ -86,6 +86,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -104,6 +105,9 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
 import kotlin.math.abs
 
+private fun preferencesSafeWidth(context: android.content.Context): Int =
+    (context.resources.displayMetrics.widthPixels / context.resources.displayMetrics.density).toInt()
+
 private enum class CapsuleSection(val label: String) {
     OVERVIEW("Prehľad"), MEDIA("Hudba"), NOTIFICATIONS("Upozornenia"), CONTROLS("Ovládanie"), APPS("Aplikácie"), SYSTEM("Systém"), WIDGET("QR widget"), CONTACTS("Kontakty")
 }
@@ -114,6 +118,8 @@ fun CapsuleOverlayUi(
     onOpenSettings: () -> Unit
 ) {
     val context = LocalContext.current
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    val safeExpandedWidth = minOf(preferencesSafeWidth(context), (screenWidthDp - 24).coerceAtLeast(280))
     val snapshot by CapsuleRuntime.state.collectAsState()
     val preferences = remember { CapsulePrefs.read(context) }
     LaunchedEffect(Unit) { CapsuleRuntime.setQuickApps(preferences.quickApps) }
@@ -141,7 +147,7 @@ fun CapsuleOverlayUi(
             "previous_section" -> { val current = enabledSections.indexOf(section).coerceAtLeast(0); section = enabledSections[(current - 1 + enabledSections.size) % enabledSections.size]; expanded = true }
         }
     }
-    val targetWidth = if (expanded) preferences.expandedWidthDp.dp else preferences.widthDp.dp
+    val targetWidth = if (expanded) minOf(preferences.expandedWidthDp, safeExpandedWidth.toFloat()).dp else minOf(preferences.widthDp, safeExpandedWidth.toFloat()).dp
     val width by animateDpAsState(targetValue = targetWidth, animationSpec = spring(dampingRatio = 0.78f, stiffness = 420f), label = "capsule-width")
     val radius by animateDpAsState(
         targetValue = if (expanded) 30.dp else preferences.cornerRadiusDp.dp,
@@ -152,7 +158,7 @@ fun CapsuleOverlayUi(
     val muted = Color(0xFFB4C0AE)
     val green = Color(preferences.accentColorArgb)
 
-    Box(modifier = Modifier.width(width).widthIn(min = 104.dp, max = 420.dp)) {
+    Box(modifier = Modifier.width(width).widthIn(min = 104.dp, max = safeExpandedWidth.dp)) {
         Surface(
             color = bg,
             contentColor = fg,
