@@ -14,9 +14,6 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      ANDROID_HOME: /usr/local/lib/android/sdk
-      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
@@ -55,10 +52,16 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '9.5.0'
-      - name: Accept required Android SDK licenses
-        run: yes | "$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager" --licenses || true
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 20.0
+          packages: platform-tools
+          accept-android-sdk-licenses: false
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
       - name: Install Android SDK platform
-        run: "$ANDROID_HOME/cmdline-tools/16.0/bin/sdkmanager" "platforms;android-37" "build-tools;36.0.0" "platform-tools"
+        run: sdkmanager "platforms;android-37" "build-tools;36.0.0"
       - name: Build debug APK
         working-directory: PixelCapsuleAndroid
         run: gradle --no-daemon assembleDebug
