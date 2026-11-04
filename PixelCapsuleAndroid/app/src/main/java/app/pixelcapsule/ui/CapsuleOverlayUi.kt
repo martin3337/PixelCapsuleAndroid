@@ -87,6 +87,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -109,7 +110,7 @@ private fun preferencesSafeWidth(context: android.content.Context): Int =
     (context.resources.displayMetrics.widthPixels / context.resources.displayMetrics.density).toInt()
 
 private enum class CapsuleSection(val label: String) {
-    OVERVIEW("Prehľad"), MEDIA("Hudba"), NOTIFICATIONS("Upozornenia"), CONTROLS("Ovládanie"), APPS("Aplikácie"), SYSTEM("Systém"), WIDGET("QR widget"), CONTACTS("Kontakty")
+    OVERVIEW(stringResource(R.string.section_overview)), MEDIA(stringResource(R.string.section_media)), NOTIFICATIONS(stringResource(R.string.section_notifications)), CONTROLS(stringResource(R.string.section_controls)), APPS(stringResource(R.string.section_apps)), SYSTEM(stringResource(R.string.section_system)), WIDGET(stringResource(R.string.section_widget)), CONTACTS(stringResource(R.string.section_contacts))
 }
 
 @Composable
@@ -255,18 +256,18 @@ private fun CollapsedCapsule(
             call.isRinging -> {
                 Icon(Icons.Default.Call, contentDescription = null, tint = green, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(9.dp))
-                Text("Prichádzajúci hovor", color = fg, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, maxLines = 1)
+                Text(stringResource(R.string.incoming_call), color = fg, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, maxLines = 1)
             }
             call.isActive -> {
                 Icon(Icons.Default.Call, contentDescription = null, tint = green, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(9.dp))
-                Text("Prebieha hovor", color = fg, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, maxLines = 1)
+                Text(stringResource(R.string.call_in_progress), color = fg, fontWeight = FontWeight.SemiBold, fontSize = 12.sp, maxLines = 1)
                 Spacer(Modifier.weight(1f))
                 Text(formatDuration((elapsedNow - call.startedElapsedRealtime).coerceAtLeast(0L)), color = muted, fontSize = 11.sp)
             }
             media != null -> {
                 if (media.artwork != null) {
-                    Image(media.artwork.asImageBitmap(), contentDescription = "Obal albumu", modifier = Modifier.size(30.dp).clip(RoundedCornerShape(8.dp)))
+                    Image(media.artwork.asImageBitmap(), contentDescription = stringResource(R.string.album_art), modifier = Modifier.size(30.dp).clip(RoundedCornerShape(8.dp)))
                 } else {
                     Icon(Icons.Default.MusicNote, contentDescription = null, tint = green, modifier = Modifier.size(20.dp))
                 }
@@ -347,25 +348,25 @@ private fun ExpandedCapsule(
                     detectVerticalDragGestures(onVerticalDrag = { change, amount -> if (amount > 8f) onSwipeDown(); change.consume() })
                 }
             ) {
-                Text("PIXEL CAPSULE", color = muted, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
+                Text(stringResource(R.string.capsule_header), color = muted, fontSize = 9.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.2.sp)
                 Text(
                     when {
-                        call.isRinging -> "Prichádzajúci hovor"
+                        call.isRinging -> stringResource(R.string.incoming_call)
                         call.isActive -> "Hovor prebieha"
-                        section == CapsuleSection.MEDIA -> "Prehrávač médií"
-                        section == CapsuleSection.NOTIFICATIONS -> "Upozornenia"
-                        section == CapsuleSection.CONTROLS -> "Rýchle ovládače"
-                        section == CapsuleSection.APPS -> "Obľúbené aplikácie"
-                        section == CapsuleSection.SYSTEM -> "Systémové skratky"
-                        section == CapsuleSection.WIDGET -> "Vlastný QR widget"
-                        section == CapsuleSection.CONTACTS -> "Kontakty"
+                        section == CapsuleSection.MEDIA -> stringResource(R.string.media_player_title)
+                        section == CapsuleSection.NOTIFICATIONS -> stringResource(R.string.section_notifications)
+                        section == CapsuleSection.CONTROLS -> stringResource(R.string.quick_controls)
+                        section == CapsuleSection.APPS -> stringResource(R.string.favourite_apps_title)
+                        section == CapsuleSection.SYSTEM -> stringResource(R.string.system_shortcuts)
+                        section == CapsuleSection.WIDGET -> stringResource(R.string.custom_qr_widget)
+                        section == CapsuleSection.CONTACTS -> stringResource(R.string.section_contacts)
                         else -> "Tvoj okamžitý prehľad"
                     },
                     color = fg, fontWeight = FontWeight.SemiBold, fontSize = 15.sp
                 )
             }
-            IconButton(onClick = onOpenSettings, modifier = Modifier.size(34.dp)) { Icon(Icons.Default.Settings, contentDescription = "Nastavenia", tint = muted, modifier = Modifier.size(18.dp)) }
-            IconButton(onClick = onCollapse, modifier = Modifier.size(34.dp)) { Icon(Icons.Default.Close, contentDescription = "Zavrieť", tint = muted, modifier = Modifier.size(18.dp)) }
+            IconButton(onClick = onOpenSettings, modifier = Modifier.size(34.dp)) { Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings), tint = muted, modifier = Modifier.size(18.dp)) }
+            IconButton(onClick = onCollapse, modifier = Modifier.size(34.dp)) { Icon(Icons.Default.Close, contentDescription = stringResource(R.string.close), tint = muted, modifier = Modifier.size(18.dp)) }
         }
         if (call.isVisible) {
             CallCard(call = call, green = green)
@@ -374,7 +375,7 @@ private fun ExpandedCapsule(
             items(sections) { item ->
                 AssistChip(
                     onClick = { onSection(item) },
-                    label = { Text(item.label, fontSize = 10.sp) },
+                    label = { Text(stringResource(item.labelRes), fontSize = 10.sp) },
                     leadingIcon = {
                         Icon(
                             when (item) {
@@ -402,7 +403,7 @@ private fun ExpandedCapsule(
             CapsuleSection.WIDGET -> CustomQrWidgetPanel(widgetText, green, muted)
             CapsuleSection.CONTACTS -> ContactsPanel(muted)
         }
-        Text("Potiahni do strán na prepnutie • podrž na nastavenia", color = muted, fontSize = 9.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
+        Text(stringResource(R.string.gesture_hint), color = muted, fontSize = 9.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
     }
 }
 
@@ -423,21 +424,21 @@ private fun CallCard(call: CallInfo, green: Color) {
         Row(modifier = Modifier.fillMaxWidth().padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
             Icon(Icons.Default.Call, contentDescription = null, tint = green)
             Column(modifier = Modifier.weight(1f).padding(horizontal = 9.dp)) {
-                Text(if (call.isRinging) "Prichádzajúci hovor" else "Aktívny hovor", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
-                Text(if (call.isRinging) "Vyber akciu" else durationText, color = Color(0xFFC3D0BD), fontSize = 10.sp)
+                Text(if (call.isRinging) stringResource(R.string.incoming_call) else stringResource(R.string.active_call), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+                Text(if (call.isRinging) stringResource(R.string.choose_action) else durationText, color = Color(0xFFC3D0BD), fontSize = 10.sp)
             }
             if (call.isRinging) {
                 IconButton(onClick = {
                     DeviceControls.answerOrRejectCall(context, true).onFailure {
-                        Toast.makeText(context, it.message ?: "Hovor sa nepodarilo prijať", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, it.message ?: stringResource(R.string.call_answer_failed), Toast.LENGTH_SHORT).show()
                     }
-                }) { Icon(Icons.Default.Call, contentDescription = "Prijať hovor", tint = green) }
+                }) { Icon(Icons.Default.Call, contentDescription = stringResource(R.string.answer_call), tint = green) }
             }
             IconButton(onClick = {
                 DeviceControls.answerOrRejectCall(context, false).onFailure {
-                    Toast.makeText(context, it.message ?: "Hovor sa nepodarilo ukončiť", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, it.message ?: stringResource(R.string.call_end_failed), Toast.LENGTH_SHORT).show()
                 }
-            }) { Icon(Icons.Default.CallEnd, contentDescription = "Odmietnuť alebo ukončiť hovor", tint = Color(0xFFFF8A80)) }
+            }) { Icon(Icons.Default.CallEnd, contentDescription = stringResource(R.string.end_or_reject_call), tint = Color(0xFFFF8A80)) }
         }
     }
 }
@@ -456,12 +457,12 @@ private fun OverviewPanel(
                     Text(media.title, color = Color.White, fontWeight = FontWeight.Medium, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 12.sp)
                     Text(media.artist.ifBlank { media.appName }, color = muted, fontSize = 10.sp)
                 }
-                Text(if (media.playing) "PREHRÁVA" else "POZASTAVENÉ", color = green, fontSize = 9.sp)
+                Text(if (media.playing) stringResource(R.string.playing) else stringResource(R.string.paused), color = green, fontSize = 9.sp)
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             StatusTile(
-                "Batéria",
+                stringResource(R.string.battery),
                 when {
                     battery < 0 -> "—"
                     charging -> "$battery% • $chargingSource"
@@ -472,11 +473,11 @@ private fun OverviewPanel(
                 green
             )
             StatusTile(
-                "Bluetooth",
+                stringResource(R.string.bluetooth),
                 when {
-                    !bluetoothConnected -> "Odpojené"
+                    !bluetoothConnected -> stringResource(R.string.disconnected)
                     bluetoothBatteryPercent != null -> "Pripojené • $bluetoothBatteryPercent%"
-                    else -> "Pripojené"
+                    else -> stringResource(R.string.connected)
                 },
                 Icons.Default.Bluetooth,
                 Modifier.weight(1f),
@@ -510,7 +511,7 @@ private fun StatusTile(title: String, value: String, icon: androidx.compose.ui.g
 @Composable
 private fun MediaPanel(media: MediaInfo?, green: Color, muted: Color) {
     if (media == null) {
-        Text("Zatiaľ nie je aktívne prehrávanie. Spusti hudbu alebo video a kapsula zachytí dostupnú MediaSession.", color = muted, fontSize = 11.sp)
+        Text(stringResource(R.string.no_media), color = muted, fontSize = 11.sp)
         return
     }
     var position by remember(media.packageName, media.title) { mutableLongStateOf(media.positionMs) }
@@ -524,7 +525,7 @@ private fun MediaPanel(media: MediaInfo?, green: Color, muted: Color) {
     val controller = CapsuleRuntime.activeMediaController
     Row(verticalAlignment = Alignment.CenterVertically) {
         if (media.artwork != null) {
-            Image(media.artwork.asImageBitmap(), "Obal albumu", modifier = Modifier.size(58.dp).clip(RoundedCornerShape(13.dp)))
+            Image(media.artwork.asImageBitmap(), stringResource(R.string.album_art), modifier = Modifier.size(58.dp).clip(RoundedCornerShape(13.dp)))
         } else {
             Surface(Modifier.size(58.dp), shape = RoundedCornerShape(13.dp), color = Color(0xFF2B3B2C)) {
                 Box(contentAlignment = Alignment.Center) { Icon(Icons.Default.MusicNote, null, tint = green, modifier = Modifier.size(28.dp)) }
@@ -554,7 +555,7 @@ private fun MediaPanel(media: MediaInfo?, green: Color, muted: Color) {
         IconButton(onClick = {
             if (media.playing) controller?.transportControls?.pause() else controller?.transportControls?.play()
         }, modifier = Modifier.size(52.dp)) {
-            Icon(if (media.playing) Icons.Default.Pause else Icons.Default.PlayArrow, "Prehrať alebo pozastaviť", tint = green, modifier = Modifier.size(34.dp))
+            Icon(if (media.playing) Icons.Default.Pause else Icons.Default.PlayArrow, stringResource(R.string.play_pause), tint = green, modifier = Modifier.size(34.dp))
         }
         IconButton(onClick = { controller?.transportControls?.skipToNext() }) { Icon(Icons.Default.SkipNext, "Ďalšia", tint = Color.White, modifier = Modifier.size(28.dp)) }
     }
@@ -567,13 +568,13 @@ private fun MediaPanel(media: MediaInfo?, green: Color, muted: Color) {
             }
             if (intent.resolveActivity(context.packageManager) != null) {
                 runCatching { context.startActivity(intent) }.onFailure {
-                    Toast.makeText(context, "Ekvalizér sa nepodarilo otvoriť.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, stringResource(R.string.equalizer_failed), Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(context, "Tvoje zariadenie neposkytuje systémový ekvalizér.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, stringResource(R.string.equalizer_unavailable), Toast.LENGTH_SHORT).show()
             }
         }) {
-            Text("Otvoriť ekvalizér zvuku", color = green, fontSize = 10.sp)
+            Text(stringResource(R.string.open_equalizer), color = green, fontSize = 10.sp)
         }
     }
 }
@@ -595,7 +596,7 @@ private fun NotificationsPanel(items: List<NotificationInfo>, onFocusableChanged
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(item.appName, color = Color(0xFFB9D69A), fontSize = 9.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
                         TextButton(onClick = { CapsuleRuntime.dismissNotification(item.key) }) {
-                            Text("Zavrieť", color = muted, fontSize = 9.sp)
+                            Text(stringResource(R.string.close), color = muted, fontSize = 9.sp)
                         }
                     }
                     Text(item.title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -617,7 +618,7 @@ private fun NotificationReply(item: NotificationInfo, onFocusableChanged: (Boole
     var replying by remember(item.key) { mutableStateOf(false) }
     var message by remember(item.key) { mutableStateOf("") }
     if (!replying) {
-        TextButton(onClick = { replying = true; onFocusableChanged(true) }) { Text("Rýchlo odpovedať", color = Color(0xFFB9D69A), fontSize = 10.sp) }
+        TextButton(onClick = { replying = true; onFocusableChanged(true) }) { Text(stringResource(R.string.reply_quickly), color = Color(0xFFB9D69A), fontSize = 10.sp) }
     } else {
         Row(verticalAlignment = Alignment.CenterVertically) {
             BasicTextField(
@@ -628,18 +629,18 @@ private fun NotificationReply(item: NotificationInfo, onFocusableChanged: (Boole
                 modifier = Modifier.weight(1f).onFocusChanged { onFocusableChanged(it.isFocused) },
                 decorationBox = { inner ->
                     Box(Modifier.fillMaxWidth().background(Color(0xFF303B31), RoundedCornerShape(14.dp)).padding(horizontal = 10.dp, vertical = 9.dp)) {
-                        if (message.isEmpty()) Text("Napíš odpoveď…", color = Color(0xFF9EAA99), fontSize = 11.sp)
+                        if (message.isEmpty()) Text(stringResource(R.string.write_reply), color = Color(0xFF9EAA99), fontSize = 11.sp)
                         inner()
                     }
                 }
             )
             IconButton(onClick = {
                 val sent = CapsuleRuntime.sendQuickReply(context, item.key, message)
-                Toast.makeText(context, if (sent) "Odpoveď odoslaná" else "Aplikácia neponúka funkčnú rýchlu odpoveď", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, if (sent) stringResource(R.string.reply_sent) else stringResource(R.string.quick_reply_unavailable), Toast.LENGTH_SHORT).show()
                 message = ""
                 replying = false
                 onFocusableChanged(false)
-            }) { Icon(Icons.Default.Send, "Odoslať odpoveď", tint = Color(0xFFB9D69A)) }
+            }) { Icon(Icons.Default.Send, stringResource(R.string.send_reply), tint = Color(0xFFB9D69A)) }
         }
     }
 }
@@ -656,7 +657,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
     var autoBrightness by remember { mutableStateOf(DeviceControls.isAutoBrightness(context)) }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        ControlRow("Baterka", "${if (torchOn) "Zapnutá" else "Vypnutá"}${torch?.let { " • ${it.maxStrength} úrovní" } ?: " • nedostupná"}", Icons.Default.FlashOn, green) {
+        ControlRow("Baterka", "${if (torchOn) stringResource(R.string.flashlight_on) else stringResource(R.string.flashlight_off)}${torch?.let { " • ${it.maxStrength} úrovní" } ?: " • nedostupná"}", Icons.Default.FlashOn, green) {
             if (torch == null) return@ControlRow
             val next = !torchOn
             DeviceControls.setTorch(context, next, torchStrength.toInt()).onSuccess { torchOn = next }.onFailure {
@@ -666,7 +667,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
         if (torch != null && torch.maxStrength > 1) {
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text("Intenzita blesku", color = Color.White, fontSize = 11.sp, modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.flashlight_level), color = Color.White, fontSize = 11.sp, modifier = Modifier.weight(1f))
                     Text("${torchStrength.toInt()} / ${torch.maxStrength}", color = muted, fontSize = 10.sp)
                 }
                 Slider(
@@ -685,7 +686,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Brightness6, null, tint = green, modifier = Modifier.size(17.dp))
                 Text("  Jas displeja", color = Color.White, fontSize = 11.sp, modifier = Modifier.weight(1f))
-                Text(if (autoBrightness) "Auto" else "${brightness.toInt()}%", color = muted, fontSize = 10.sp)
+                Text(if (autoBrightness) stringResource(R.string.auto) else "${brightness.toInt()}%", color = muted, fontSize = 10.sp)
             }
             Slider(
                 value = brightness,
@@ -706,10 +707,10 @@ private fun ControlsPanel(green: Color, muted: Color) {
                     Toast.makeText(context, it.message ?: "Zmena automatického jasu zlyhala", Toast.LENGTH_SHORT).show()
                     MainActivity.openWriteSettings(context)
                 }
-            }) { Text(if (autoBrightness) "Prepnúť na manuálny jas" else "Zapnúť automatický jas", fontSize = 10.sp, color = green) }
+            }) { Text(if (autoBrightness) stringResource(R.string.switch_manual_brightness) else stringResource(R.string.enable_auto_brightness), fontSize = 10.sp, color = green) }
         }
-        VolumeSlider("Hlasitosť médií", mediaVolume, { mediaVolume = it }, { DeviceControls.setVolume(context, AudioManager.STREAM_MUSIC, mediaVolume.toInt()) }, green, muted)
-        VolumeSlider("Hlasitosť zvonenia", ringVolume, { ringVolume = it }, { DeviceControls.setVolume(context, AudioManager.STREAM_RING, ringVolume.toInt()) }, green, muted)
+        VolumeSlider(stringResource(R.string.media_volume), mediaVolume, { mediaVolume = it }, { DeviceControls.setVolume(context, AudioManager.STREAM_MUSIC, mediaVolume.toInt()) }, green, muted)
+        VolumeSlider(stringResource(R.string.ring_volume), ringVolume, { ringVolume = it }, { DeviceControls.setVolume(context, AudioManager.STREAM_RING, ringVolume.toInt()) }, green, muted)
     }
 }
 
@@ -722,7 +723,7 @@ private fun ControlRow(title: String, status: String, icon: androidx.compose.ui.
                 Text(title, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
                 Text(status, color = Color(0xFFB4C0AE), fontSize = 9.sp)
             }
-            Text("Zmeniť", color = accent, fontSize = 10.sp)
+            Text(stringResource(R.string.change), color = accent, fontSize = 10.sp)
         }
     }
 }
@@ -743,12 +744,12 @@ private fun VolumeSlider(title: String, value: Float, onChange: (Float) -> Unit,
 private fun SystemShortcutsPanel(muted: Color) {
     val context = LocalContext.current
     val shortcuts = listOf(
-        "Internet" to android.provider.Settings.Panel.ACTION_INTERNET_CONNECTIVITY,
-        "Bluetooth" to android.provider.Settings.ACTION_BLUETOOTH_SETTINGS,
-        "Hlasitosť" to android.provider.Settings.Panel.ACTION_VOLUME,
-        "Batéria" to android.provider.Settings.ACTION_BATTERY_SAVER_SETTINGS,
-        "Displej" to android.provider.Settings.ACTION_DISPLAY_SETTINGS,
-        "Všetky nastavenia" to android.provider.Settings.ACTION_SETTINGS
+        stringResource(R.string.internet) to android.provider.Settings.Panel.ACTION_INTERNET_CONNECTIVITY,
+        stringResource(R.string.bluetooth) to android.provider.Settings.ACTION_BLUETOOTH_SETTINGS,
+        stringResource(R.string.volume) to android.provider.Settings.Panel.ACTION_VOLUME,
+        stringResource(R.string.battery) to android.provider.Settings.ACTION_BATTERY_SAVER_SETTINGS,
+        stringResource(R.string.display) to android.provider.Settings.ACTION_DISPLAY_SETTINGS,
+        stringResource(R.string.all_settings) to android.provider.Settings.ACTION_SETTINGS
     )
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Text("Otvára systémové panely Androidu. Dostupnosť konkrétneho panela závisí od verzie a výrobcu telefónu.", color = muted, fontSize = 10.sp)
@@ -762,7 +763,7 @@ private fun SystemShortcutsPanel(muted: Color) {
                                 runCatching {
                                     context.startActivity(Intent(android.provider.Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                                 }
-                                Toast.makeText(context, "Tento systémový panel nie je dostupný; otvorili sa nastavenia.", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, stringResource(R.string.system_panel_unavailable), Toast.LENGTH_SHORT).show()
                             }
                         },
                         modifier = Modifier.weight(1f),
@@ -798,27 +799,27 @@ private fun CustomQrWidgetPanel(text: String, green: Color, muted: Color) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(9.dp)
     ) {
-        Text("Tvoj vlastný QR kód", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+        Text(stringResource(R.string.qr_your_code), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
         if (bitmap != null) {
             Surface(color = Color.White, shape = RoundedCornerShape(18.dp)) {
                 Image(bitmap.asImageBitmap(), contentDescription = "Vlastný QR kód", modifier = Modifier.padding(10.dp).size(190.dp))
             }
         } else {
-            Text("QR kód sa nepodarilo vytvoriť. Skontroluj text v nastaveniach.", color = muted, fontSize = 10.sp)
+            Text(stringResource(R.string.qr_failed), color = muted, fontSize = 10.sp)
         }
         Text(text, color = muted, fontSize = 10.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             TextButton(onClick = {
                 val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                 clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Pixel Capsule widget", text))
-                Toast.makeText(context, "Text skopírovaný", Toast.LENGTH_SHORT).show()
-            }) { Text("Kopírovať", color = green, fontSize = 10.sp) }
+                Toast.makeText(context, stringResource(R.string.text_copied), Toast.LENGTH_SHORT).show()
+            }) { Text(stringResource(R.string.copy), color = green, fontSize = 10.sp) }
             val uri = runCatching { Uri.parse(text) }.getOrNull()
             if (uri?.scheme == "https" || uri?.scheme == "http") {
                 TextButton(onClick = {
                     runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
-                        .onFailure { Toast.makeText(context, "Odkaz sa nepodarilo otvoriť", Toast.LENGTH_SHORT).show() }
-                }) { Text("Otvoriť odkaz", color = green, fontSize = 10.sp) }
+                        .onFailure { Toast.makeText(context, stringResource(R.string.link_open_failed), Toast.LENGTH_SHORT).show() }
+                }) { Text(stringResource(R.string.open_link), color = green, fontSize = 10.sp) }
             }
         }
     }
@@ -830,7 +831,7 @@ private fun ContactsPanel(muted: Color) {
     var entries by remember { mutableStateOf(CapsulePrefs.read(context).contacts) }
     val contacts = entries.mapNotNull { raw -> val parts = raw.split('|', limit = 2); if (parts.size == 2) parts[0] to parts[1] else null }
     if (contacts.isEmpty()) {
-        Text("Zatiaľ nemáš pridané kontakty. V aplikácii Pixel Capsule vyber možnosť Pridať kontakt do kapsuly.", color = muted, fontSize = 11.sp)
+        Text(stringResource(R.string.no_contacts), color = muted, fontSize = 11.sp)
         return
     }
     Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -843,7 +844,7 @@ private fun ContactsPanel(muted: Color) {
                 Row(Modifier.fillMaxWidth().padding(11.dp), verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Default.Call, null, tint = Color(0xFFB9D69A), modifier = Modifier.size(18.dp))
                     Text(name, color = Color.White, modifier = Modifier.weight(1f).padding(start = 10.dp), fontSize = 11.sp, fontWeight = FontWeight.SemiBold)
-                    TextButton(onClick = { CapsulePrefs.removeContact(context, uri); entries = CapsulePrefs.read(context).contacts }) { Text("Odobrať", color = muted, fontSize = 9.sp) }
+                    TextButton(onClick = { CapsulePrefs.removeContact(context, uri); entries = CapsulePrefs.read(context).contacts }) { Text(stringResource(R.string.remove), color = muted, fontSize = 9.sp) }
                 }
             }
         }
