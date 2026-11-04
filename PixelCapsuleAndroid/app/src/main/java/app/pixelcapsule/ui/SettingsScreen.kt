@@ -88,14 +88,14 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        TextButton(onClick = onBack) { Text("← Späť") }
+        TextButton(onClick = onBack) { Text(capsuleString(R.string.back_arrow)) }
         Text(capsuleString(R.string.settings_title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-        Text("Jemne dolaď polohu, rozmery a obsah kapsuly. Poloha výrezu sa zisťuje z geometrie displeja automaticky.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(capsuleString(R.string.settings_intro_full), color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(capsuleString(R.string.qr_widget), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                Text("Vlož text alebo odkaz. Kapsula z neho vytvorí QR kód; v kapsule ho môžeš skopírovať alebo otvoriť odkaz.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                Text(capsuleString(R.string.qr_widget_desc_full), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 OutlinedTextField(
                     value = widgetText,
                     onValueChange = { widgetText = it.take(500); save() },
@@ -147,7 +147,7 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
         Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Text(capsuleString(R.string.custom_gestures), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                Text("Nastav akciu pre ťuknutie, dvojité ťuknutie, podržanie a všetky smery potiahnutia.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                Text(capsuleString(R.string.gestures_desc_full), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 val actions = listOf("toggle" to capsuleString(R.string.gesture_toggle), "expand" to capsuleString(R.string.gesture_expand), "collapse" to capsuleString(R.string.gesture_collapse), "next_section" to capsuleString(R.string.gesture_next), "previous_section" to capsuleString(R.string.gesture_previous), "media" to capsuleString(R.string.gesture_open_player), "notifications" to capsuleString(R.string.gesture_open_notifications), "settings" to capsuleString(R.string.gesture_open_settings))
                 GestureSetting(capsuleString(R.string.gesture_tap), tap, actions) { tap = it; save(true) }
                 GestureSetting(capsuleString(R.string.gesture_double_tap), doubleTap, actions) { doubleTap = it; save(true) }
@@ -158,7 +158,7 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
                 GestureSetting(capsuleString(R.string.gesture_swipe_down), swipeDown, actions) { swipeDown = it; save(true) }
             }
         }
-        Text("Poznámka: Android vykresľuje systémový stavový riadok nad aplikačnými overlay oknami. Kapsula sa preto zarovnáva podľa výrezu a zobrazuje sa v jeho dostupnej oblasti; nemôže nahradiť systémový stavový riadok.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(capsuleString(R.string.overlay_note_full), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
