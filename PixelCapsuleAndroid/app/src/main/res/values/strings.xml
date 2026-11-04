@@ -50,7 +50,6 @@
     <string name="overlay_running">Pixel Capsule is active</string>
     <string name="overlay_notification_text">Tap to open Pixel Capsule settings</string>
     <string name="turn_off">Turn off</string>
-    <string name="back">Back</string>
     <string name="settings_title">Customize</string>
     <string name="settings_intro">Fine-tune the capsule position, size and content. The camera cutout position is detected from display geometry.</string>
     <string name="qr_widget">Custom QR widget</string>
@@ -178,4 +177,5 @@
     <string name="no_contacts">No contacts have been added yet. Open Pixel Capsule and choose Add contact to capsule.</string>
     <string name="remove">Remove</string>
     <string name="no_favourite_apps">No app shortcuts selected yet. Open settings and add apps to the capsule.</string>
+    <string name="back_arrow">Back</string>
 </resources>
