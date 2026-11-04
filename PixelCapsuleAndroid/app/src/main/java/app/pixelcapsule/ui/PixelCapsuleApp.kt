@@ -105,9 +105,10 @@ private fun HomeScreen(
     permissionRefreshKey: Int
 ) {
     val context = LocalContext.current
-    val overlayGranted = Settings.canDrawOverlays(context)
-    val notificationGranted = isNotificationAccessEnabled(context)
-    val writeGranted = Settings.System.canWrite(context)
+    // Permission APIs are not Compose state. Re-read them whenever Activity resumes.
+    val overlayGranted = remember(permissionRefreshKey) { Settings.canDrawOverlays(context) }
+    val notificationGranted = remember(permissionRefreshKey) { isNotificationAccessEnabled(context) }
+    val writeGranted = remember(permissionRefreshKey) { Settings.System.canWrite(context) }
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 18.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -268,15 +269,18 @@ private fun PermissionStatusCard(title: String, description: String, granted: Bo
 @Composable
 fun PermissionsScreen(onBack: () -> Unit, onRequestCallPermissions: () -> Unit, onRequestCameraPermission: () -> Unit, onRequestBluetoothPermission: () -> Unit, permissionRefreshKey: Int) {
     val context = LocalContext.current
+    val overlayGranted = remember(permissionRefreshKey) { Settings.canDrawOverlays(context) }
+    val notificationGranted = remember(permissionRefreshKey) { isNotificationAccessEnabled(context) }
+    val writeGranted = remember(permissionRefreshKey) { Settings.System.canWrite(context) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onBack) { Text("← Späť") }
             Text("Sprievodca oprávneniami", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         }
         Text("Zapni iba tie prístupy, ktoré chceš používať. Každý prístup môžeš neskôr odobrať v nastaveniach Androidu.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        PermissionStatusCard("Overlay", "Plávajúca kapsula na obrazovke.", Settings.canDrawOverlays(context), { MainActivity.openOverlaySettings(context) })
-        PermissionStatusCard("Notifikácie", "Texty upozornení a akcie rýchlej odpovede.", isNotificationAccessEnabled(context), { MainActivity.openNotificationSettings(context) })
-        PermissionStatusCard("Systémové nastavenia", "Manuálny jas displeja a automatický režim.", Settings.System.canWrite(context), { MainActivity.openWriteSettings(context) })
+        PermissionStatusCard("Overlay", "Plávajúca kapsula na obrazovke.", overlayGranted, { MainActivity.openOverlaySettings(context) })
+        PermissionStatusCard("Notifikácie", "Texty upozornení a akcie rýchlej odpovede.", notificationGranted, { MainActivity.openNotificationSettings(context) })
+        PermissionStatusCard("Systémové nastavenia", "Manuálny jas displeja a automatický režim.", writeGranted, { MainActivity.openWriteSettings(context) })
         PermissionStatusCard("Telefón", "Stav SIM hovoru; pri prijatí/odmietnutí je potrebné samostatné povolenie.", ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED, onRequestCallPermissions)
         PermissionStatusCard("Fotoaparát / blesk", "Povolenie sa používa iba pri ovládaní LED blesku.", ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED, onRequestCameraPermission)
         PermissionStatusCard("Bluetooth príslušenstvo", "Voliteľný prístup k úrovni batérie podporovaných zariadení.", android.os.Build.VERSION.SDK_INT < 31 || ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED, onRequestBluetoothPermission)
