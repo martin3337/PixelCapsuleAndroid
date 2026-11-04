@@ -100,4 +100,7 @@
     <string name="gesture_swipe_up">Swipe up</string>
     <string name="gesture_swipe_down">Swipe down</string>
     <string name="overlay_note">Note: Android draws the system status bar above application overlays. The capsule aligns with the display cutout and stays in its available area; it cannot replace the system status bar.</string>
+    <string name="quick_apps_title">Quick apps</string>
+    <string name="quick_apps_desc">Choose the apps you want available in the expanded capsule. Only launchable apps are shown; Android restricts access to hidden packages.</string>
+    <string name="selected_count">Selected: %1$d</string>
 </resources>
