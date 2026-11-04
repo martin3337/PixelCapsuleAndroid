@@ -117,6 +117,7 @@ private fun HomeScreen(
             Column(modifier = Modifier.weight(1f)) {
                 Text("Pixel Capsule", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                 Text(capsuleString(R.string.home_subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(capsuleString(R.string.language_note), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
             }
             Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.primaryContainer) {
                 Icon(Icons.Default.Bolt, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.padding(13.dp).size(28.dp))
