@@ -201,4 +201,5 @@
     <string name="charging_source">Power</string>
     <string name="previous">Previous</string>
     <string name="next">Next</string>
+    <string name="notification_listener_label">Pixel Capsule – notifications and media</string>
 </resources>
