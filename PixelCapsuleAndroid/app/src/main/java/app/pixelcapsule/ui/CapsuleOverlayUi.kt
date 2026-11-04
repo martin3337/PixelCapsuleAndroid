@@ -115,6 +115,14 @@ fun CapsuleOverlayUi(
     LaunchedEffect(Unit) { CapsuleRuntime.setQuickApps(preferences.quickApps) }
     var expanded by remember { mutableStateOf(false) }
     var section by remember { mutableStateOf(CapsuleSection.OVERVIEW) }
+    val enabledSections = buildList {
+        add(CapsuleSection.OVERVIEW)
+        if (preferences.showMedia) add(CapsuleSection.MEDIA)
+        if (preferences.showNotifications) add(CapsuleSection.NOTIFICATIONS)
+        if (preferences.showControls) add(CapsuleSection.CONTROLS)
+        if (preferences.showApps) add(CapsuleSection.APPS)
+        add(CapsuleSection.CONTACTS)
+    }
     fun performGesture(action: String) {
         when (action) {
             "toggle" -> expanded = !expanded
@@ -123,8 +131,8 @@ fun CapsuleOverlayUi(
             "settings" -> onOpenSettings()
             "media" -> { section = CapsuleSection.MEDIA; expanded = true }
             "notifications" -> { section = CapsuleSection.NOTIFICATIONS; expanded = true }
-            "next_section" -> { val all = CapsuleSection.entries; section = all[(all.indexOf(section) + 1) % all.size]; expanded = true }
-            "previous_section" -> { val all = CapsuleSection.entries; section = all[(all.indexOf(section) - 1 + all.size) % all.size]; expanded = true }
+            "next_section" -> { val current = enabledSections.indexOf(section).coerceAtLeast(0); section = enabledSections[(current + 1) % enabledSections.size]; expanded = true }
+            "previous_section" -> { val current = enabledSections.indexOf(section).coerceAtLeast(0); section = enabledSections[(current - 1 + enabledSections.size) % enabledSections.size]; expanded = true }
         }
     }
     val targetWidth = if (expanded) preferences.expandedWidthDp.dp else preferences.widthDp.dp
@@ -156,7 +164,7 @@ fun CapsuleOverlayUi(
             AnimatedContent(targetState = expanded, label = "capsule-expand") { isExpanded ->
                 if (!isExpanded) {
                     CollapsedCapsule(
-                        media = snapshot.media,
+                        media = if (preferences.showMedia) snapshot.media else null,
                         call = snapshot.call,
                         battery = snapshot.batteryPercent,
                         charging = snapshot.isCharging,
@@ -169,9 +177,10 @@ fun CapsuleOverlayUi(
                 } else {
                     ExpandedCapsule(
                         section = section,
+                        sections = enabledSections,
                         onSection = { section = it },
                         snapshotMedia = snapshot.media,
-                        notifications = snapshot.notifications,
+                        notifications = if (preferences.showNotifications) snapshot.notifications else emptyList(),
                         call = snapshot.call,
                         battery = snapshot.batteryPercent,
                         charging = snapshot.isCharging,
@@ -288,6 +297,7 @@ private fun EqualizerBars(playing: Boolean, color: Color) {
 @Composable
 private fun ExpandedCapsule(
     section: CapsuleSection,
+    sections: List<CapsuleSection>,
     onSection: (CapsuleSection) -> Unit,
     snapshotMedia: MediaInfo?,
     notifications: List<NotificationInfo>,
@@ -341,7 +351,7 @@ private fun ExpandedCapsule(
             CallCard(call = call, green = green)
         }
         LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-            items(CapsuleSection.entries) { item ->
+            items(sections) { item ->
                 AssistChip(
                     onClick = { onSection(item) },
                     label = { Text(item.label, fontSize = 10.sp) },
