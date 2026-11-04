@@ -25,6 +25,7 @@ class CapsuleNotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         super.onListenerConnected()
+        CapsuleRuntime.setNotificationDismissHandler { key -> cancelNotification(key) }
         runCatching {
             val manager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
             manager.addOnActiveSessionsChangedListener(
@@ -48,6 +49,7 @@ class CapsuleNotificationListener : NotificationListenerService() {
         }
         sessionListenerRegistered = false
         activeController = null
+        CapsuleRuntime.setNotificationDismissHandler(null)
         CapsuleRuntime.setMedia(null, null)
         requestRebind(ComponentName(this, CapsuleNotificationListener::class.java))
     }
