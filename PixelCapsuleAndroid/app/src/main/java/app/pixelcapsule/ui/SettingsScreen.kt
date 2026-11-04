@@ -37,6 +37,7 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
     val context = LocalContext.current
     val initial = remember { CapsulePrefs.read(context) }
     var width by remember { mutableFloatStateOf(initial.widthDp) }
+    var expandedWidth by remember { mutableFloatStateOf(initial.expandedWidthDp) }
     var radius by remember { mutableFloatStateOf(initial.cornerRadiusDp) }
     var offsetX by remember { mutableFloatStateOf(initial.offsetXDp) }
     var offsetY by remember { mutableFloatStateOf(initial.offsetYDp) }
@@ -58,6 +59,7 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
         CapsulePrefs.write(context) {
             copy(
                 widthDp = width,
+                expandedWidthDp = expandedWidth,
                 cornerRadiusDp = radius,
                 offsetXDp = offsetX,
                 offsetYDp = offsetY,
@@ -90,7 +92,8 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
         Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Text("Geometria", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                SliderSetting("Šírka kapsuly", width, 104f..220f, { width = it; save() }, { save(true) }, "${width.toInt()} dp")
+                SliderSetting("Šírka zbalenej kapsuly", width, 104f..220f, { width = it; save() }, { save(true) }, "${width.toInt()} dp")
+                SliderSetting("Šírka rozbalenej kapsuly", expandedWidth, 260f..420f, { expandedWidth = it; save() }, { save(true) }, "${expandedWidth.toInt()} dp")
                 SliderSetting("Zaoblenie rohov", radius, 16f..48f, { radius = it; save() }, { save(true) }, "${radius.toInt()} dp")
                 SliderSetting("Posun do strán", offsetX, -120f..120f, { offsetX = it; save() }, { save(true) }, "${offsetX.toInt()} dp")
                 SliderSetting("Posun hore / dole", offsetY, -20f..100f, { offsetY = it; save() }, { save(true) }, "${offsetY.toInt()} dp")
