@@ -352,7 +352,7 @@ private fun ExpandedCapsule(
                                 CapsuleSection.CONTROLS -> Icons.Default.Brightness6
                                 CapsuleSection.APPS -> Icons.Default.Apps
                                 CapsuleSection.CONTACTS -> Icons.Default.Call
-                                CapsuleSection.OVERVIEW -> Icons.Default.Home
+                                CapsuleSection.OVERVIEW -> Icons.Default.Info
                             }, null, modifier = Modifier.size(14.dp)
                         )
                     }
