@@ -475,7 +475,7 @@ private fun OverviewPanel(
                 capsuleString(R.string.bluetooth),
                 when {
                     !bluetoothConnected -> capsuleString(R.string.disconnected)
-                    bluetoothBatteryPercent != null -> "Pripojené • $bluetoothBatteryPercent%"
+                    bluetoothBatteryPercent != null -> capsuleString(R.string.connected_percent, bluetoothBatteryPercent)
                     else -> capsuleString(R.string.connected)
                 },
                 Icons.Default.Bluetooth,
