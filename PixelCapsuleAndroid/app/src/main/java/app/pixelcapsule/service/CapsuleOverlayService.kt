@@ -46,6 +46,10 @@ class CapsuleOverlayService : Service() {
                 Intent.ACTION_BATTERY_CHANGED -> updateBattery(intent)
                 BluetoothDevice.ACTION_ACL_CONNECTED -> CapsuleRuntime.setBluetoothConnected(true)
                 BluetoothDevice.ACTION_ACL_DISCONNECTED -> CapsuleRuntime.setBluetoothConnected(false)
+                BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED -> {
+                    val percent = intent.getIntExtra(BluetoothDevice.EXTRA_BATTERY_LEVEL, -1)
+                    CapsuleRuntime.setBluetoothBatteryPercent(percent.takeIf { it in 0..100 })
+                }
             }
         }
     }
@@ -191,6 +195,7 @@ class CapsuleOverlayService : Service() {
             addAction(Intent.ACTION_BATTERY_CHANGED)
             addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
+            addAction(BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED)
         }
         val sticky = ContextCompat.registerReceiver(this, stateReceiver, filter, ContextCompat.RECEIVER_EXPORTED)
         receiverRegistered = true
@@ -203,7 +208,14 @@ class CapsuleOverlayService : Service() {
         val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
         val charging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
             status == BatteryManager.BATTERY_STATUS_FULL
-        CapsuleRuntime.setBattery(if (level >= 0) (level * 100 / scale) else 0, charging)
+        val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0)
+        val source = when (plugged) {
+            BatteryManager.BATTERY_PLUGGED_USB -> "USB"
+            BatteryManager.BATTERY_PLUGGED_AC -> "Adaptér"
+            BatteryManager.BATTERY_PLUGGED_WIRELESS -> "Bezdrôtovo"
+            else -> "Napájanie"
+        }
+        CapsuleRuntime.setBattery(if (level >= 0) (level * 100 / scale) else 0, charging, source)
     }
 
     @Suppress("DEPRECATION")
