@@ -16,6 +16,7 @@ object CapsulePrefs {
     private const val KEY_APPS = "show_apps"
     private const val KEY_QUICK_APPS = "quick_apps"
     private const val KEY_CONTACTS = "contact_shortcuts"
+    private const val KEY_WIDGET_TEXT = "custom_widget_text"
     private const val KEY_ACCENT = "accent_color_argb"
     private const val KEY_TAP = "gesture_tap"
     private const val KEY_DOUBLE_TAP = "gesture_double_tap"
@@ -40,6 +41,7 @@ object CapsulePrefs {
             showApps = p.getBoolean(KEY_APPS, true),
             quickApps = p.getStringSet(KEY_QUICK_APPS, emptySet())?.toSet().orEmpty(),
             contacts = p.getStringSet(KEY_CONTACTS, emptySet())?.toSet().orEmpty(),
+            widgetText = p.getString(KEY_WIDGET_TEXT, "").orEmpty(),
             accentColorArgb = p.getLong(KEY_ACCENT, 0xFFB9D69AL),
             tapAction = p.getString(KEY_TAP, "toggle") ?: "toggle",
             doubleTapAction = p.getString(KEY_DOUBLE_TAP, "next_section") ?: "next_section",
@@ -67,6 +69,7 @@ object CapsulePrefs {
             .putBoolean(KEY_APPS, next.showApps)
             .putStringSet(KEY_QUICK_APPS, next.quickApps.toSet())
             .putStringSet(KEY_CONTACTS, next.contacts.toSet())
+            .putString(KEY_WIDGET_TEXT, next.widgetText.take(500))
             .putLong(KEY_ACCENT, next.accentColorArgb)
             .putString(KEY_TAP, next.tapAction)
             .putString(KEY_DOUBLE_TAP, next.doubleTapAction)
