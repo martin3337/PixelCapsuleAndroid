@@ -182,7 +182,7 @@
     <string name="bluetooth_permission_desc">Voliteľné povolenie na zobrazenie úrovne batérie podporovaných slúchadiel a zariadení.</string>
     <string name="notifications_permission_detail">Texty upozornení a akcie rýchlej odpovede.</string>
     <string name="phone_permission_detail">Stav SIM hovoru; pri prijatí/odmietnutí je potrebné samostatné povolenie.</string>
-    <string name="accessibility_detail">AccessibilityService sa nevyžaduje. Kapsula používa vlastné dotykové gestá a samostatné systémové rozhrania.</string>
+    <string name="accessibility_detail">Voliteľné: číta iba názov aktívnej aplikácie, aby zobrazil stav aplikácie a umožnil návrat na začiatok. Nikdy nečíta text ani obsah obrazovky.</string>
     <string name="settings_intro_full">Jemne dolaď polohu, rozmery a obsah kapsuly. Poloha výrezu sa zisťuje z geometrie displeja automaticky.</string>
     <string name="qr_widget_desc_full">Vlož text alebo odkaz. Kapsula z neho vytvorí QR kód; v kapsule ho môžeš skopírovať alebo otvoriť odkaz.</string>
     <string name="gestures_desc_full">Nastav akciu pre ťuknutie, dvojité ťuknutie, podržanie a všetky smery potiahnutia.</string>
@@ -203,4 +203,24 @@
     <string name="next">Ďalšia</string>
     <string name="notification_listener_label">Pixel Capsule – notifikácie a médiá</string>
     <string name="language_note">Jazyk: automaticky podľa systémového jazyka Androidu. Ďalšie podporované jazyky prekladá Google ML Kit priamo v zariadení; jazykový model sa môže stiahnuť cez Wi‑Fi.</string>
+    <string name="accessibility_access">Funkcie prístupnosti</string>
+    <string name="accessibility_access_desc">Voliteľné: rozpozná aktívnu aplikáciu a umožní gesto návratu na začiatok. Nečíta text ani obsah obrazovky.</string>
+    <string name="accessibility_service_label">Pomocník prístupnosti Pixel Capsule</string>
+    <string name="accessibility_service_description">Pixel Capsule sleduje iba zmeny aktívneho okna, aby zobrazil aktuálnu aplikáciu a vykonal používateľom vyžiadané gesto návratu na začiatok. Nečíta obsah okien.</string>
+    <string name="accessibility_service_summary">Názov aktívnej aplikácie a voliteľné gesto návratu na začiatok</string>
+    <string name="scroll_to_top">Prejsť na začiatok</string>
+    <string name="accessibility_required">Zapni prístupnosť Pixel Capsule, aby si mohol použiť toto gesto.</string>
+    <string name="active_app">Aktívna aplikácia</string>
+    <string name="charging_stats">Podrobnosti batérie</string>
+    <string name="battery_health_good">Zdravie batérie: dobré</string>
+    <string name="battery_health_overheat">Prehrievanie batérie</string>
+    <string name="battery_health_dead">Stav batérie: kritický</string>
+    <string name="battery_health_over_voltage">Prepäťová ochrana batérie</string>
+    <string name="battery_health_failure">Zdravie batérie: systémová chyba</string>
+    <string name="battery_health_unknown">Zdravie batérie: neznáme</string>
+    <string name="strength_levels">%1$d úrovní</string>
+    <string name="not_available">Nedostupná</string>
+    <string name="intensity_failed">Zmena intenzity zlyhala</string>
+    <string name="brightness_failed">Zmena jasu zlyhala</string>
+    <string name="playing_media">Prehráva sa</string>
 </resources>

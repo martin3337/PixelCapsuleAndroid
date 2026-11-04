@@ -110,13 +110,31 @@ object CapsuleRuntime {
         }
     }
 
-    fun setBattery(level: Int, charging: Boolean, source: String = "") {
+    fun setBattery(
+        level: Int,
+        charging: Boolean,
+        source: String = "",
+        temperatureC: Float? = null,
+        voltageMv: Int? = null,
+        currentMa: Int? = null,
+        health: String? = null
+    ) {
         mutableState.update {
             it.copy(
                 batteryPercent = level.coerceIn(0, 100),
                 isCharging = charging,
-                chargingSource = if (charging) source else ""
+                chargingSource = if (charging) source else "",
+                batteryTemperatureC = temperatureC,
+                batteryVoltageMv = voltageMv,
+                batteryCurrentMa = currentMa,
+                batteryHealth = health
             )
+        }
+    }
+
+    fun setForegroundApp(packageName: String?, appName: String?) {
+        mutableState.update {
+            it.copy(foregroundPackageName = packageName, foregroundAppName = appName)
         }
     }
 

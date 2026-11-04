@@ -53,7 +53,13 @@ data class CapsuleUiState(
     val bluetoothConnected: Boolean = false,
     val bluetoothBatteryPercent: Int? = null,
     val downloadPercent: Int? = null,
-    val quickApps: Set<String> = emptySet()
+    val quickApps: Set<String> = emptySet(),
+    val foregroundPackageName: String? = null,
+    val foregroundAppName: String? = null,
+    val batteryTemperatureC: Float? = null,
+    val batteryVoltageMv: Int? = null,
+    val batteryCurrentMa: Int? = null,
+    val batteryHealth: String? = null
 )
 
 data class ContactShortcut(val uri: String, val name: String)

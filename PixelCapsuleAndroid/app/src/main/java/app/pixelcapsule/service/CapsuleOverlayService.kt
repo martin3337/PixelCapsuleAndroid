@@ -111,11 +111,11 @@ class CapsuleOverlayService : Service(), LifecycleOwner, SavedStateRegistryOwner
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(getString(R.string.overlay_running))
-            .setContentText("Tap to open Pixel Capsule settings")
+            .setContentText(getString(R.string.overlay_notification_text))
             .setContentIntent(openApp)
             .setOngoing(true)
             .setCategory(Notification.CATEGORY_SERVICE)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Turn off", stop)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, getString(R.string.turn_off), stop)
             .build()
         if (Build.VERSION.SDK_INT >= 34) {
             startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
@@ -246,7 +246,31 @@ class CapsuleOverlayService : Service(), LifecycleOwner, SavedStateRegistryOwner
             BatteryManager.BATTERY_PLUGGED_WIRELESS -> getString(R.string.charging_wireless)
             else -> getString(R.string.charging_source)
         }
-        CapsuleRuntime.setBattery(if (level >= 0) (level * 100 / scale) else 0, charging, source)
+        val batteryManager = getSystemService(BATTERY_SERVICE) as BatteryManager
+        val temperatureRaw = intent.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, -1)
+        val voltageRaw = intent.getIntExtra(BatteryManager.EXTRA_VOLTAGE, -1)
+        val healthRaw = intent.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN)
+        val currentRaw = runCatching {
+            batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CURRENT_NOW)
+        }.getOrDefault(Int.MIN_VALUE)
+        val currentMa = currentRaw.takeIf { it != Int.MIN_VALUE && it != 0 }?.div(1000)
+        val health = when (healthRaw) {
+            BatteryManager.BATTERY_HEALTH_GOOD -> getString(R.string.battery_health_good)
+            BatteryManager.BATTERY_HEALTH_OVERHEAT -> getString(R.string.battery_health_overheat)
+            BatteryManager.BATTERY_HEALTH_DEAD -> getString(R.string.battery_health_dead)
+            BatteryManager.BATTERY_HEALTH_OVER_VOLTAGE -> getString(R.string.battery_health_over_voltage)
+            BatteryManager.BATTERY_HEALTH_UNSPECIFIED_FAILURE -> getString(R.string.battery_health_failure)
+            else -> getString(R.string.battery_health_unknown)
+        }
+        CapsuleRuntime.setBattery(
+            if (level >= 0) (level * 100 / scale) else 0,
+            charging,
+            source,
+            temperatureRaw.takeIf { it >= 0 }?.div(10f),
+            voltageRaw.takeIf { it > 0 },
+            currentMa,
+            health
+        )
     }
 
     @Suppress("DEPRECATION")

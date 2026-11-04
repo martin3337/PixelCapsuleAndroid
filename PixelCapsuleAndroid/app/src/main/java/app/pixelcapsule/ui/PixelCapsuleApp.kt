@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import app.pixelcapsule.MainActivity
+import app.pixelcapsule.service.CapsuleAccessibilityService
 
 @Composable
 fun PixelCapsuleApp(
@@ -113,6 +114,7 @@ private fun HomeScreen(
     val overlayGranted = remember(permissionRefreshKey) { Settings.canDrawOverlays(context) }
     val notificationGranted = remember(permissionRefreshKey) { isNotificationAccessEnabled(context) }
     val writeGranted = remember(permissionRefreshKey) { Settings.System.canWrite(context) }
+    val accessibilityGranted = remember(permissionRefreshKey) { isAccessibilityServiceEnabled(context) }
     Column(
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 18.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -166,6 +168,12 @@ private fun HomeScreen(
             description = capsuleString(R.string.notification_access_desc),
             granted = notificationGranted,
             onClick = { MainActivity.openNotificationSettings(context) }
+        )
+        PermissionStatusCard(
+            title = capsuleString(R.string.accessibility_access),
+            description = capsuleString(R.string.accessibility_access_desc),
+            granted = accessibilityGranted,
+            onClick = { MainActivity.openAccessibilitySettings(context) }
         )
         PermissionStatusCard(
             title = capsuleString(R.string.modify_settings),
@@ -331,6 +339,7 @@ fun PermissionsScreen(onBack: () -> Unit, onRequestCallPermissions: () -> Unit, 
     val overlayGranted = remember(permissionRefreshKey) { Settings.canDrawOverlays(context) }
     val notificationGranted = remember(permissionRefreshKey) { isNotificationAccessEnabled(context) }
     val writeGranted = remember(permissionRefreshKey) { Settings.System.canWrite(context) }
+    val accessibilityGranted = remember(permissionRefreshKey) { isAccessibilityServiceEnabled(context) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onBack) { Text(capsuleString(R.string.back_arrow)) }
@@ -339,6 +348,7 @@ fun PermissionsScreen(onBack: () -> Unit, onRequestCallPermissions: () -> Unit, 
         Text(capsuleString(R.string.permission_guide_desc), color = MaterialTheme.colorScheme.onSurfaceVariant)
         PermissionStatusCard(capsuleString(R.string.overlay), capsuleString(R.string.floating_capsule), overlayGranted, { MainActivity.openOverlaySettings(context) })
         PermissionStatusCard(capsuleString(R.string.notifications), capsuleString(R.string.notifications_permission_detail), notificationGranted, { MainActivity.openNotificationSettings(context) })
+        PermissionStatusCard(capsuleString(R.string.accessibility_access), capsuleString(R.string.accessibility_access_desc), accessibilityGranted, { MainActivity.openAccessibilitySettings(context) })
         PermissionStatusCard(capsuleString(R.string.system_settings), capsuleString(R.string.brightness_auto), writeGranted, { MainActivity.openWriteSettings(context) })
         PermissionStatusCard(capsuleString(R.string.phone), capsuleString(R.string.phone_permission_detail), ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED, onRequestCallPermissions)
         PermissionStatusCard(capsuleString(R.string.camera_flash), capsuleString(R.string.camera_flash_desc), ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED, onRequestCameraPermission)
@@ -350,5 +360,15 @@ fun PermissionsScreen(onBack: () -> Unit, onRequestCallPermissions: () -> Unit, 
 fun isNotificationAccessEnabled(context: Context): Boolean {
     val component = ComponentName(context, app.pixelcapsule.service.CapsuleNotificationListener::class.java)
     val enabled = Settings.Secure.getString(context.contentResolver, "enabled_notification_listeners") ?: return false
+    return enabled.split(':').any { ComponentName.unflattenFromString(it) == component }
+}
+
+
+fun isAccessibilityServiceEnabled(context: Context): Boolean {
+    val component = ComponentName(context, CapsuleAccessibilityService::class.java)
+    val enabled = Settings.Secure.getString(
+        context.contentResolver,
+        Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+    ) ?: return false
     return enabled.split(':').any { ComponentName.unflattenFromString(it) == component }
 }

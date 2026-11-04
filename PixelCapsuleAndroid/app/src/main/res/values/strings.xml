@@ -182,7 +182,7 @@
     <string name="bluetooth_permission_desc">Optional access to battery levels for supported headphones and accessories.</string>
     <string name="notifications_permission_detail">Notification text and quick-reply actions.</string>
     <string name="phone_permission_detail">SIM call status; answering or rejecting requires a separate permission.</string>
-    <string name="accessibility_detail">AccessibilityService is not required. The capsule uses its own touch gestures and Android system interfaces.</string>
+    <string name="accessibility_detail">Optional: reads only the active app name to show app-aware status and enable scroll-to-top. It never reads screen text or content.</string>
     <string name="settings_intro_full">Fine-tune the capsule position, size and content. The display cutout position is detected automatically from display geometry.</string>
     <string name="qr_widget_desc_full">Enter text or a link. The capsule creates a QR code that you can copy or open from the capsule.</string>
     <string name="gestures_desc_full">Set the action for a tap, double tap, long press and every swipe direction.</string>
@@ -203,4 +203,24 @@
     <string name="next">Next</string>
     <string name="notification_listener_label">Pixel Capsule – notifications and media</string>
     <string name="language_note">Language: follows your Android system language. Other supported languages are translated on-device with Google ML Kit; a language model may download over Wi-Fi.</string>
+    <string name="accessibility_access">Accessibility features</string>
+    <string name="accessibility_access_desc">Optional: identifies the foreground app and enables the scroll-to-top gesture. It does not read screen text or content.</string>
+    <string name="accessibility_service_label">Pixel Capsule accessibility helper</string>
+    <string name="accessibility_service_description">Pixel Capsule observes only app-window changes so it can show the active app and perform a user-requested scroll-to-top gesture. It does not retrieve window content.</string>
+    <string name="accessibility_service_summary">Foreground app label and optional scroll-to-top gesture</string>
+    <string name="scroll_to_top">Scroll to top</string>
+    <string name="accessibility_required">Enable Pixel Capsule accessibility access to use this gesture.</string>
+    <string name="active_app">Active app</string>
+    <string name="charging_stats">Battery details</string>
+    <string name="battery_health_good">Battery health: good</string>
+    <string name="battery_health_overheat">Battery overheating</string>
+    <string name="battery_health_dead">Battery health: critical</string>
+    <string name="battery_health_over_voltage">Battery over-voltage</string>
+    <string name="battery_health_failure">Battery health: system failure</string>
+    <string name="battery_health_unknown">Battery health: unknown</string>
+    <string name="strength_levels">%1$d levels</string>
+    <string name="not_available">Unavailable</string>
+    <string name="intensity_failed">Could not change flashlight intensity</string>
+    <string name="brightness_failed">Could not change brightness</string>
+    <string name="playing_media">Now playing</string>
 </resources>

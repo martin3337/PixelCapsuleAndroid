@@ -119,6 +119,12 @@ class MainActivity : ComponentActivity() {
             context.startActivity(Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
         }
 
+        fun openAccessibilitySettings(context: android.content.Context) {
+            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(intent)
+        }
+
         fun openWriteSettings(context: android.content.Context) {
             val intent = Intent(
                 Settings.ACTION_MANAGE_WRITE_SETTINGS,

@@ -142,7 +142,7 @@ class CapsuleNotificationListener : NotificationListenerService() {
         val info = MediaInfo(
             packageName = controller.packageName,
             appName = appLabel,
-            title = metadata.getString(MediaMetadata.METADATA_KEY_TITLE).orEmpty().ifBlank { "Prehráva sa" },
+            title = metadata.getString(MediaMetadata.METADATA_KEY_TITLE).orEmpty().ifBlank { getString(R.string.playing_media) },
             artist = metadata.getString(MediaMetadata.METADATA_KEY_ARTIST).orEmpty(),
             album = metadata.getString(MediaMetadata.METADATA_KEY_ALBUM).orEmpty(),
             durationMs = metadata.getLong(MediaMetadata.METADATA_KEY_DURATION).coerceAtLeast(0L),

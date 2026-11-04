@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.SystemClock
 import android.widget.Toast
+import app.pixelcapsule.service.CapsuleAccessibilityService
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
@@ -86,6 +87,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -108,8 +111,15 @@ import kotlin.math.abs
 private fun preferencesSafeWidth(context: android.content.Context): Int =
     (context.resources.displayMetrics.widthPixels / context.resources.displayMetrics.density).toInt()
 
-private enum class CapsuleSection(val label: String) {
-    OVERVIEW(capsuleString(R.string.section_overview)), MEDIA(capsuleString(R.string.section_media)), NOTIFICATIONS(capsuleString(R.string.section_notifications)), CONTROLS(capsuleString(R.string.section_controls)), APPS(capsuleString(R.string.section_apps)), SYSTEM(capsuleString(R.string.section_system)), WIDGET(capsuleString(R.string.section_widget)), CONTACTS(capsuleString(R.string.section_contacts))
+private enum class CapsuleSection(val labelRes: Int) {
+    OVERVIEW(R.string.section_overview),
+    MEDIA(R.string.section_media),
+    NOTIFICATIONS(R.string.section_notifications),
+    CONTROLS(R.string.section_controls),
+    APPS(R.string.section_apps),
+    SYSTEM(R.string.section_system),
+    WIDGET(R.string.section_widget),
+    CONTACTS(R.string.section_contacts)
 }
 
 @Composable
@@ -118,6 +128,7 @@ fun CapsuleOverlayUi(
     onOpenSettings: () -> Unit
 ) {
     val context = LocalContext.current
+    val haptics = LocalHapticFeedback.current
     val screenWidthDp = LocalConfiguration.current.screenWidthDp
     val safeExpandedWidth = minOf(preferencesSafeWidth(context), (screenWidthDp - 24).coerceAtLeast(280))
     val snapshot by CapsuleRuntime.state.collectAsState()
@@ -145,6 +156,11 @@ fun CapsuleOverlayUi(
             "notifications" -> if (preferences.showNotifications) { section = CapsuleSection.NOTIFICATIONS; expanded = true }
             "next_section" -> { val current = enabledSections.indexOf(section).coerceAtLeast(0); section = enabledSections[(current + 1) % enabledSections.size]; expanded = true }
             "previous_section" -> { val current = enabledSections.indexOf(section).coerceAtLeast(0); section = enabledSections[(current - 1 + enabledSections.size) % enabledSections.size]; expanded = true }
+            "scroll_to_top" -> {
+                if (!CapsuleAccessibilityService.scrollToTop()) {
+                    Toast.makeText(context, context.getString(R.string.accessibility_required), Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
     val targetWidth = if (expanded) minOf(preferences.expandedWidthDp, safeExpandedWidth.toFloat()).dp else minOf(preferences.widthDp, safeExpandedWidth.toFloat()).dp
@@ -170,7 +186,10 @@ fun CapsuleOverlayUi(
                 .combinedClickable(
                     onClick = { performGesture(preferences.tapAction) },
                     onDoubleClick = { performGesture(preferences.doubleTapAction) },
-                    onLongClick = { performGesture(preferences.longPressAction) }
+                    onLongClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        performGesture(preferences.longPressAction)
+                    }
                 )
         ) {
             AnimatedContent(targetState = expanded, label = "capsule-expand") { isExpanded ->
@@ -351,7 +370,7 @@ private fun ExpandedCapsule(
                 Text(
                     when {
                         call.isRinging -> capsuleString(R.string.incoming_call)
-                        call.isActive -> "Hovor prebieha"
+                        call.isActive -> capsuleString(R.string.call_in_progress)
                         section == CapsuleSection.MEDIA -> capsuleString(R.string.media_player_title)
                         section == CapsuleSection.NOTIFICATIONS -> capsuleString(R.string.section_notifications)
                         section == CapsuleSection.CONTROLS -> capsuleString(R.string.quick_controls)
@@ -448,6 +467,13 @@ private fun OverviewPanel(
     chargingSource: String, bluetoothConnected: Boolean, bluetoothBatteryPercent: Int?,
     downloadPercent: Int?, green: Color, muted: Color
 ) {
+    val liveState by CapsuleRuntime.state.collectAsState()
+    val batteryStats = buildList {
+        liveState.batteryTemperatureC?.let { add("${it.toInt()}°C") }
+        liveState.batteryVoltageMv?.let { add("${"%.2f".format(it / 1000f)} V") }
+        liveState.batteryCurrentMa?.let { add("${abs(it)} mA") }
+        liveState.batteryHealth?.takeIf { it.isNotBlank() }?.let { add(it) }
+    }
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         if (media != null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
@@ -488,6 +514,16 @@ private fun OverviewPanel(
                 Text(capsuleString(R.string.download_progress, downloadPercent), color = Color.White, fontSize = 11.sp)
                 LinearProgressIndicator(progress = { (downloadPercent / 100f).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth(), color = green)
             }
+        }
+        if (batteryStats.isNotEmpty()) {
+            Text(
+                capsuleString(R.string.charging_stats) + " • " + batteryStats.joinToString(" • "),
+                color = muted,
+                fontSize = 10.sp
+            )
+        }
+        liveState.foregroundAppName?.let { appName ->
+            Text(capsuleString(R.string.active_app) + ": " + appName, color = muted, fontSize = 10.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
         Text(capsuleString(R.string.recent_notifications, notifications.size), color = muted, fontSize = 10.sp)
         notifications.firstOrNull()?.let { Text("${it.appName}: ${it.title}", color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp) }
@@ -656,7 +692,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
     var autoBrightness by remember { mutableStateOf(DeviceControls.isAutoBrightness(context)) }
 
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        ControlRow("Baterka", "${if (torchOn) capsuleString(R.string.flashlight_on) else capsuleString(R.string.flashlight_off)}${torch?.let { " • ${it.maxStrength} úrovní" } ?: " • nedostupná"}", Icons.Default.FlashOn, green) {
+        ControlRow(capsuleString(R.string.flashlight), "${if (torchOn) capsuleString(R.string.flashlight_on) else capsuleString(R.string.flashlight_off)}${torch?.let { " • " + capsuleString(R.string.strength_levels, it.maxStrength) } ?: " • " + capsuleString(R.string.not_available)}", Icons.Default.FlashOn, green) {
             if (torch == null) return@ControlRow
             val next = !torchOn
             DeviceControls.setTorch(context, next, torchStrength.toInt()).onSuccess { torchOn = next }.onFailure {
@@ -675,7 +711,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
                     valueRange = 1f..torch.maxStrength.toFloat(),
                     onValueChangeFinished = {
                         if (torchOn) DeviceControls.setTorch(context, true, torchStrength.toInt()).onFailure {
-                            Toast.makeText(context, it.message ?: "Zmena intenzity zlyhala", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, it.message ?: context.getString(R.string.intensity_failed), Toast.LENGTH_SHORT).show()
                         }
                     }
                 )
@@ -684,7 +720,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.Brightness6, null, tint = green, modifier = Modifier.size(17.dp))
-                Text("  Jas displeja", color = Color.White, fontSize = 11.sp, modifier = Modifier.weight(1f))
+                Text("  " + capsuleString(R.string.display_brightness), color = Color.White, fontSize = 11.sp, modifier = Modifier.weight(1f))
                 Text(if (autoBrightness) capsuleString(R.string.auto) else "${brightness.toInt()}%", color = muted, fontSize = 10.sp)
             }
             Slider(
@@ -694,7 +730,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
                     DeviceControls.setBrightness(context, brightness.toInt()).onSuccess {
                         autoBrightness = false
                     }.onFailure {
-                        Toast.makeText(context, it.message ?: "Zmena jasu zlyhala", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, it.message ?: context.getString(R.string.brightness_failed), Toast.LENGTH_SHORT).show()
                         MainActivity.openWriteSettings(context)
                     }
                 },
