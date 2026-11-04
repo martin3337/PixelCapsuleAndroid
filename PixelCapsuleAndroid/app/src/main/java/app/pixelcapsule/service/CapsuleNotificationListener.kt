@@ -1,5 +1,6 @@
 package app.pixelcapsule.service
 
+import app.pixelcapsule.R
 import android.content.ComponentName
 import android.media.MediaMetadata
 import android.media.session.MediaController

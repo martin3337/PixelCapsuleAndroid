@@ -1,5 +1,6 @@
 package app.pixelcapsule.ui
 
+import app.pixelcapsule.R
 import android.media.AudioManager
 import android.graphics.Bitmap
 import android.media.audiofx.AudioEffect

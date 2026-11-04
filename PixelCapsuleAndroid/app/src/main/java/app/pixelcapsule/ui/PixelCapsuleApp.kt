@@ -1,5 +1,6 @@
 package app.pixelcapsule.ui
 
+import app.pixelcapsule.R
 import android.Manifest
 import android.content.ComponentName
 import android.content.Context
