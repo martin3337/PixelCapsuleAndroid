@@ -202,4 +202,5 @@
     <string name="previous">Predchádzajúca</string>
     <string name="next">Ďalšia</string>
     <string name="notification_listener_label">Pixel Capsule – notifikácie a médiá</string>
+    <string name="language_note">Jazyk: automaticky podľa systémového jazyka Androidu. Ďalšie podporované jazyky prekladá Google ML Kit priamo v zariadení; jazykový model sa môže stiahnuť cez Wi‑Fi.</string>
 </resources>
