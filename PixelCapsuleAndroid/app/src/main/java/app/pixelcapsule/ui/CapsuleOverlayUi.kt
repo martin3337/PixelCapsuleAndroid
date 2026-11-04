@@ -359,7 +359,7 @@ private fun ExpandedCapsule(
                         section == CapsuleSection.SYSTEM -> capsuleString(R.string.system_shortcuts)
                         section == CapsuleSection.WIDGET -> capsuleString(R.string.custom_qr_widget)
                         section == CapsuleSection.CONTACTS -> capsuleString(R.string.section_contacts)
-                        else -> "Tvoj okamžitý prehľad"
+                        else -> capsuleString(R.string.overview_title)
                     },
                     color = fg, fontWeight = FontWeight.SemiBold, fontSize = 15.sp
                 )
@@ -485,11 +485,11 @@ private fun OverviewPanel(
         }
         if (downloadPercent != null) {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Sťahovanie • $downloadPercent%", color = Color.White, fontSize = 11.sp)
+                Text(capsuleString(R.string.download_progress, downloadPercent), color = Color.White, fontSize = 11.sp)
                 LinearProgressIndicator(progress = { (downloadPercent / 100f).coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth(), color = green)
             }
         }
-        Text("Posledné upozornenia: ${notifications.size}", color = muted, fontSize = 10.sp)
+        Text(capsuleString(R.string.recent_notifications, notifications.size), color = muted, fontSize = 10.sp)
         notifications.firstOrNull()?.let { Text("${it.appName}: ${it.title}", color = Color.White, maxLines = 1, overflow = TextOverflow.Ellipsis, fontSize = 11.sp) }
     }
 }
@@ -550,13 +550,13 @@ private fun MediaPanel(media: MediaInfo?, green: Color, muted: Color) {
         }
     }
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-        IconButton(onClick = { controller?.transportControls?.skipToPrevious() }) { Icon(Icons.Default.SkipPrevious, "Predchádzajúca", tint = Color.White, modifier = Modifier.size(28.dp)) }
+        IconButton(onClick = { controller?.transportControls?.skipToPrevious() }) { Icon(Icons.Default.SkipPrevious, capsuleString(R.string.previous), tint = Color.White, modifier = Modifier.size(28.dp)) }
         IconButton(onClick = {
             if (media.playing) controller?.transportControls?.pause() else controller?.transportControls?.play()
         }, modifier = Modifier.size(52.dp)) {
             Icon(if (media.playing) Icons.Default.Pause else Icons.Default.PlayArrow, capsuleString(R.string.play_pause), tint = green, modifier = Modifier.size(34.dp))
         }
-        IconButton(onClick = { controller?.transportControls?.skipToNext() }) { Icon(Icons.Default.SkipNext, "Ďalšia", tint = Color.White, modifier = Modifier.size(28.dp)) }
+        IconButton(onClick = { controller?.transportControls?.skipToNext() }) { Icon(Icons.Default.SkipNext, capsuleString(R.string.next), tint = Color.White, modifier = Modifier.size(28.dp)) }
     }
     val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
@@ -581,7 +581,7 @@ private fun MediaPanel(media: MediaInfo?, green: Color, muted: Color) {
 @Composable
 private fun NotificationsPanel(items: List<NotificationInfo>, onFocusableChanged: (Boolean) -> Unit, muted: Color) {
     if (items.isEmpty()) {
-        Text("Zatiaľ tu nie sú žiadne upozornenia. Po zapnutí prístupu k notifikáciám sa zobrazia nové udalosti.", color = muted, fontSize = 11.sp)
+        Text(capsuleString(R.string.empty_notifications), color = muted, fontSize = 11.sp)
         return
     }
     Column(verticalArrangement = Arrangement.spacedBy(7.dp)) {
@@ -660,7 +660,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
             if (torch == null) return@ControlRow
             val next = !torchOn
             DeviceControls.setTorch(context, next, torchStrength.toInt()).onSuccess { torchOn = next }.onFailure {
-                Toast.makeText(context, it.message ?: "Baterku sa nepodarilo ovládať", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, it.message ?: capsuleString(R.string.torch_failed), Toast.LENGTH_SHORT).show()
             }
         }
         if (torch != null && torch.maxStrength > 1) {
@@ -703,7 +703,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
             )
             TextButton(onClick = {
                 DeviceControls.setAutoBrightness(context, !autoBrightness).onSuccess { autoBrightness = !autoBrightness }.onFailure {
-                    Toast.makeText(context, it.message ?: "Zmena automatického jasu zlyhala", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, it.message ?: capsuleString(R.string.auto_brightness_failed), Toast.LENGTH_SHORT).show()
                     MainActivity.openWriteSettings(context)
                 }
             }) { Text(if (autoBrightness) capsuleString(R.string.switch_manual_brightness) else capsuleString(R.string.enable_auto_brightness), fontSize = 10.sp, color = green) }
@@ -751,7 +751,7 @@ private fun SystemShortcutsPanel(muted: Color) {
         capsuleString(R.string.all_settings) to android.provider.Settings.ACTION_SETTINGS
     )
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        Text("Otvára systémové panely Androidu. Dostupnosť konkrétneho panela závisí od verzie a výrobcu telefónu.", color = muted, fontSize = 10.sp)
+        Text(capsuleString(R.string.system_panel_description_full), color = muted, fontSize = 10.sp)
         shortcuts.chunked(2).forEach { rowItems ->
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 rowItems.forEach { (label, action) ->
@@ -801,7 +801,7 @@ private fun CustomQrWidgetPanel(text: String, green: Color, muted: Color) {
         Text(capsuleString(R.string.qr_your_code), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
         if (bitmap != null) {
             Surface(color = Color.White, shape = RoundedCornerShape(18.dp)) {
-                Image(bitmap.asImageBitmap(), contentDescription = "Vlastný QR kód", modifier = Modifier.padding(10.dp).size(190.dp))
+                Image(bitmap.asImageBitmap(), contentDescription = capsuleString(R.string.qr_title_short), modifier = Modifier.padding(10.dp).size(190.dp))
             }
         } else {
             Text(capsuleString(R.string.qr_failed), color = muted, fontSize = 10.sp)
@@ -855,7 +855,7 @@ private fun FavouriteAppsPanel(muted: Color, quickApps: Set<String>) {
     val context = LocalContext.current
     val allApps = remember(quickApps) { AppCatalog.installedLauncherApps(context).filter { it.packageName in quickApps } }
     if (allApps.isEmpty()) {
-        Text("Zatiaľ nemáš vybrané skratky. Dlhým podržaním kapsuly otvor nastavenia a pridaj aplikácie.", color = muted, fontSize = 11.sp)
+        Text(capsuleString(R.string.empty_favourite_apps), color = muted, fontSize = 11.sp)
         return
     }
     LazyRow(horizontalArrangement = Arrangement.spacedBy(9.dp)) {
