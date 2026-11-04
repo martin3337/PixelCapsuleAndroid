@@ -21,6 +21,7 @@ import app.pixelcapsule.ui.PixelCapsuleTheme
 
 class MainActivity : ComponentActivity() {
     private var permissionRefresh by mutableIntStateOf(0)
+    private var pendingOverlayStart = false
     private val permissionResult = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { }
     private val contactPicker = registerForActivityResult(ActivityResultContracts.PickContact()) { uri ->
         if (uri != null) {
@@ -57,10 +58,20 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         permissionRefresh++
+        if (pendingOverlayStart) {
+            if (Settings.canDrawOverlays(this)) {
+                pendingOverlayStart = false
+                window.decorView.post { startOverlay() }
+            } else {
+                // Do not leave the app in a pending state when the user returns without granting access.
+                pendingOverlayStart = false
+            }
+        }
     }
 
     private fun startOverlay() {
         if (!Settings.canDrawOverlays(this)) {
+            pendingOverlayStart = true
             openOverlaySettings(this)
             return
         }
