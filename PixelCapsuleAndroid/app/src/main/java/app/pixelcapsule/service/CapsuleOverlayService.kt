@@ -195,7 +195,7 @@ class CapsuleOverlayService : Service() {
             addAction(Intent.ACTION_BATTERY_CHANGED)
             addAction(BluetoothDevice.ACTION_ACL_CONNECTED)
             addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED)
-            addAction(BluetoothDevice.ACTION_BATTERY_LEVEL_CHANGED)
+            addAction(ACTION_BLUETOOTH_BATTERY_LEVEL_CHANGED)
         }
         val sticky = ContextCompat.registerReceiver(this, stateReceiver, filter, ContextCompat.RECEIVER_EXPORTED)
         receiverRegistered = true
