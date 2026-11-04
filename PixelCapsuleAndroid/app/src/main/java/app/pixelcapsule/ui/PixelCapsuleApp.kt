@@ -166,7 +166,7 @@ private fun HomeScreen(
         PermissionStatusCard(
             title = "Hovory",
             description = "Stav hovoru a dostupné ovládanie hovoru.",
-            granted = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED,
+            granted = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED,
             onClick = onRequestCallPermissions
         )
         PermissionStatusCard(
