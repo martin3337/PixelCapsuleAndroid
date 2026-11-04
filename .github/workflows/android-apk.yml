@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     paths:
-      - 'PixelCapsuleAndroid-Source.zip'
+      - '*.zip'
       - '.github/workflows/android-apk.yml'
 
 permissions:
@@ -16,11 +16,19 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
-      - name: Extract Android project archive
+      - name: Extract uploaded Android project
+        shell: bash
         run: |
-          test -f PixelCapsuleAndroid-Source.zip
-          unzip -q PixelCapsuleAndroid-Source.zip -d .
+          archive="$(find . -maxdepth 1 -type f -iname 'PixelCapsuleAndroid-Source*.zip' -print -quit)"
+          if [ -z "$archive" ]; then
+            echo "No PixelCapsuleAndroid-Source ZIP found in repository root."
+            ls -la
+            exit 1
+          fi
+          echo "Extracting: $archive"
+          unzip -oq "$archive" -d .
           test -f PixelCapsuleAndroid/settings.gradle.kts
+          test -f PixelCapsuleAndroid/app/build.gradle.kts
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
