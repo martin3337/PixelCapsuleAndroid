@@ -202,4 +202,5 @@
     <string name="previous">Previous</string>
     <string name="next">Next</string>
     <string name="notification_listener_label">Pixel Capsule – notifications and media</string>
+    <string name="language_note">Language: follows your Android system language. Other supported languages are translated on-device with Google ML Kit; a language model may download over Wi-Fi.</string>
 </resources>
