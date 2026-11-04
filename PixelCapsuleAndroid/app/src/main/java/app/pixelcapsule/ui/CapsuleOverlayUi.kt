@@ -577,7 +577,12 @@ private fun NotificationsPanel(items: List<NotificationInfo>, onFocusableChanged
                 colors = CardDefaults.cardColors(containerColor = Color(0xFF202A22))
             ) {
                 Column(Modifier.fillMaxWidth().padding(10.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                    Text(item.appName, color = Color(0xFFB9D69A), fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(item.appName, color = Color(0xFFB9D69A), fontSize = 9.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f))
+                        TextButton(onClick = { CapsuleRuntime.dismissNotification(item.key) }) {
+                            Text("Zavrieť", color = muted, fontSize = 9.sp)
+                        }
+                    }
                     Text(item.title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 11.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     if (item.text.isNotBlank()) Text(item.text, color = Color(0xFFC5CEC0), fontSize = 10.sp, maxLines = 2, overflow = TextOverflow.Ellipsis)
                     if (item.progress != null && item.progressMax != null) {
