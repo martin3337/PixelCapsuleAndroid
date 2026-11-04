@@ -35,7 +35,7 @@ fun AppsScreen(onBack: () -> Unit) {
     val launchableApps = remember { AppCatalog.installedLauncherApps(context) }
     var favourites by remember { mutableStateOf(CapsulePrefs.read(context).quickApps) }
     Column(modifier = Modifier.fillMaxSize().padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        TextButton(onClick = onBack) { Text(capsuleString(R.string.back_arrow)) }
+        TextButton(onClick = onBack) { Text(capsuleString(R.string.back)) }
         Text(capsuleString(R.string.quick_apps_title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text(capsuleString(R.string.quick_apps_desc), color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(capsuleString(R.string.selected_count, favourites.size), color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
