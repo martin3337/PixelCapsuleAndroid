@@ -223,4 +223,8 @@
     <string name="intensity_failed">Zmena intenzity zlyhala</string>
     <string name="brightness_failed">Zmena jasu zlyhala</string>
     <string name="playing_media">Prehráva sa</string>
+    <string name="setup_status">STAV NASTAVENIA</string>
+    <string name="setup_ready">Pripravené na spustenie</string>
+    <string name="setup_incomplete">Ešte treba povoliť niekoľko oprávnení</string>
+    <string name="setup_status_description">Zapni prekrytie a prístup k notifikáciám pre základné funkcie kapsuly.</string>
 </resources>

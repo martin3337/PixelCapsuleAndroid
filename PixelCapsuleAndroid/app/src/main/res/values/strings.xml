@@ -223,4 +223,8 @@
     <string name="intensity_failed">Could not change flashlight intensity</string>
     <string name="brightness_failed">Could not change brightness</string>
     <string name="playing_media">Now playing</string>
+    <string name="setup_status">SETUP STATUS</string>
+    <string name="setup_ready">Ready to start</string>
+    <string name="setup_incomplete">A few permissions are still needed</string>
+    <string name="setup_status_description">Enable overlay and notification access for the core capsule experience.</string>
 </resources>
