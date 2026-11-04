@@ -52,6 +52,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-text")
     implementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.core:core-splashscreen:1.2.0")
+    implementation("com.google.zxing:core:3.5.3")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
