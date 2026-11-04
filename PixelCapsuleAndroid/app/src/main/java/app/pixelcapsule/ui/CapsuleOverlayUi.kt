@@ -101,7 +101,7 @@ import kotlinx.coroutines.delay
 import kotlin.math.abs
 
 private enum class CapsuleSection(val label: String) {
-    OVERVIEW("Prehľad"), MEDIA("Hudba"), NOTIFICATIONS("Upozornenia"), CONTROLS("Ovládanie"), APPS("Aplikácie"), CONTACTS("Kontakty")
+    OVERVIEW("Prehľad"), MEDIA("Hudba"), NOTIFICATIONS("Upozornenia"), CONTROLS("Ovládanie"), APPS("Aplikácie"), SYSTEM("Systém"), CONTACTS("Kontakty")
 }
 
 @Composable
@@ -121,6 +121,7 @@ fun CapsuleOverlayUi(
         if (preferences.showNotifications) add(CapsuleSection.NOTIFICATIONS)
         if (preferences.showControls) add(CapsuleSection.CONTROLS)
         if (preferences.showApps) add(CapsuleSection.APPS)
+        add(CapsuleSection.SYSTEM)
         add(CapsuleSection.CONTACTS)
     }
     fun performGesture(action: String) {
@@ -338,6 +339,7 @@ private fun ExpandedCapsule(
                         section == CapsuleSection.NOTIFICATIONS -> "Upozornenia"
                         section == CapsuleSection.CONTROLS -> "Rýchle ovládače"
                         section == CapsuleSection.APPS -> "Obľúbené aplikácie"
+                        section == CapsuleSection.SYSTEM -> "Systémové skratky"
                         section == CapsuleSection.CONTACTS -> "Kontakty"
                         else -> "Tvoj okamžitý prehľad"
                     },
@@ -362,6 +364,7 @@ private fun ExpandedCapsule(
                                 CapsuleSection.NOTIFICATIONS -> Icons.Default.Notifications
                                 CapsuleSection.CONTROLS -> Icons.Default.Brightness6
                                 CapsuleSection.APPS -> Icons.Default.Apps
+                                CapsuleSection.SYSTEM -> Icons.Default.Settings
                                 CapsuleSection.CONTACTS -> Icons.Default.Call
                                 CapsuleSection.OVERVIEW -> Icons.Default.Info
                             }, null, modifier = Modifier.size(14.dp)
@@ -376,6 +379,7 @@ private fun ExpandedCapsule(
             CapsuleSection.NOTIFICATIONS -> NotificationsPanel(notifications, onFocusableChanged, muted)
             CapsuleSection.CONTROLS -> ControlsPanel(green, muted)
             CapsuleSection.APPS -> FavouriteAppsPanel(muted, quickApps)
+            CapsuleSection.SYSTEM -> SystemShortcutsPanel(muted)
             CapsuleSection.CONTACTS -> ContactsPanel(muted)
         }
         Text("Potiahni do strán na prepnutie • podrž na nastavenia", color = muted, fontSize = 9.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -668,6 +672,45 @@ private fun VolumeSlider(title: String, value: Float, onChange: (Float) -> Unit,
             Text("${value.toInt()}%", color = muted, fontSize = 10.sp)
         }
         Slider(value = value, onValueChange = onChange, onValueChangeFinished = onFinished, valueRange = 0f..100f, modifier = Modifier.height(26.dp))
+    }
+}
+
+@Composable
+private fun SystemShortcutsPanel(muted: Color) {
+    val context = LocalContext.current
+    val shortcuts = listOf(
+        "Internet" to android.provider.Settings.Panel.ACTION_INTERNET_CONNECTIVITY,
+        "Bluetooth" to android.provider.Settings.Panel.ACTION_BLUETOOTH,
+        "Hlasitosť" to android.provider.Settings.Panel.ACTION_VOLUME,
+        "Batéria" to android.provider.Settings.ACTION_BATTERY_SAVER_SETTINGS,
+        "Displej" to android.provider.Settings.ACTION_DISPLAY_SETTINGS,
+        "Všetky nastavenia" to android.provider.Settings.ACTION_SETTINGS
+    )
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Otvára systémové panely Androidu. Dostupnosť konkrétneho panela závisí od verzie a výrobcu telefónu.", color = muted, fontSize = 10.sp)
+        shortcuts.chunked(2).forEach { rowItems ->
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                rowItems.forEach { (label, action) ->
+                    Surface(
+                        onClick = {
+                            val intent = Intent(action).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            runCatching { context.startActivity(intent) }.onFailure {
+                                runCatching {
+                                    context.startActivity(Intent(android.provider.Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                                }
+                                Toast.makeText(context, "Tento systémový panel nie je dostupný; otvorili sa nastavenia.", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(16.dp),
+                        color = Color(0xFF202A22)
+                    ) {
+                        Text(label, color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 12.dp, vertical = 14.dp))
+                    }
+                }
+                if (rowItems.size == 1) Spacer(Modifier.weight(1f))
+            }
+        }
     }
 }
 
