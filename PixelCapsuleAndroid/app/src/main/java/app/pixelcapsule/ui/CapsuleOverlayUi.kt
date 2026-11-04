@@ -722,7 +722,7 @@ private fun SystemShortcutsPanel(muted: Color) {
     val context = LocalContext.current
     val shortcuts = listOf(
         "Internet" to android.provider.Settings.Panel.ACTION_INTERNET_CONNECTIVITY,
-        "Bluetooth" to android.provider.Settings.Panel.ACTION_BLUETOOTH,
+        "Bluetooth" to android.provider.Settings.ACTION_BLUETOOTH_SETTINGS,
         "Hlasitosť" to android.provider.Settings.Panel.ACTION_VOLUME,
         "Batéria" to android.provider.Settings.ACTION_BATTERY_SAVER_SETTINGS,
         "Displej" to android.provider.Settings.ACTION_DISPLAY_SETTINGS,
