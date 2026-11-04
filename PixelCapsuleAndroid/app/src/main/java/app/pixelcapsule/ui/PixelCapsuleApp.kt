@@ -170,19 +170,19 @@ private fun HomeScreen(
         )
         PermissionStatusCard(
             title = capsuleString(R.string.calls),
-            description = "Stav hovoru a dostupné ovládanie hovoru.",
+            description = capsuleString(R.string.calls_desc),
             granted = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED,
             onClick = onRequestCallPermissions
         )
         PermissionStatusCard(
             title = capsuleString(R.string.flashlight),
-            description = "Vyžaduje povolenie fotoaparátu iba pri prvom zapnutí blesku.",
+            description = capsuleString(R.string.flashlight_first_use),
             granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED,
             onClick = onRequestCameraPermission
         )
         PermissionStatusCard(
             title = capsuleString(R.string.bluetooth_accessory),
-            description = "Voliteľné povolenie na zobrazenie úrovne batérie podporovaných slúchadiel a zariadení.",
+            description = capsuleString(R.string.bluetooth_permission_desc),
             granted = android.os.Build.VERSION.SDK_INT < 31 || ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED,
             onClick = onRequestBluetoothPermission
         )
@@ -191,7 +191,7 @@ private fun HomeScreen(
             Icon(Icons.Default.ChevronRight, contentDescription = null)
         }
         Text(
-            "Súkromie: správy sa spracúvajú lokálne v pamäti. Aplikácia ich neposiela na server ani neukladá do histórie.",
+            capsuleString(R.string.privacy_note),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
@@ -274,17 +274,17 @@ fun PermissionsScreen(onBack: () -> Unit, onRequestCallPermissions: () -> Unit, 
     val writeGranted = remember(permissionRefreshKey) { Settings.System.canWrite(context) }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            TextButton(onClick = onBack) { Text("← Späť") }
+            TextButton(onClick = onBack) { Text(capsuleString(R.string.back_arrow)) }
             Text(capsuleString(R.string.permission_guide), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         }
         Text(capsuleString(R.string.permission_guide_desc), color = MaterialTheme.colorScheme.onSurfaceVariant)
         PermissionStatusCard(capsuleString(R.string.overlay), capsuleString(R.string.floating_capsule), overlayGranted, { MainActivity.openOverlaySettings(context) })
-        PermissionStatusCard(capsuleString(R.string.notifications), "Texty upozornení a akcie rýchlej odpovede.", notificationGranted, { MainActivity.openNotificationSettings(context) })
+        PermissionStatusCard(capsuleString(R.string.notifications), capsuleString(R.string.notifications_permission_detail), notificationGranted, { MainActivity.openNotificationSettings(context) })
         PermissionStatusCard(capsuleString(R.string.system_settings), capsuleString(R.string.brightness_auto), writeGranted, { MainActivity.openWriteSettings(context) })
-        PermissionStatusCard(capsuleString(R.string.phone), "Stav SIM hovoru; pri prijatí/odmietnutí je potrebné samostatné povolenie.", ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED, onRequestCallPermissions)
+        PermissionStatusCard(capsuleString(R.string.phone), capsuleString(R.string.phone_permission_detail), ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED, onRequestCallPermissions)
         PermissionStatusCard(capsuleString(R.string.camera_flash), capsuleString(R.string.camera_flash_desc), ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED, onRequestCameraPermission)
         PermissionStatusCard(capsuleString(R.string.bluetooth_accessory), capsuleString(R.string.bluetooth_accessory_desc), android.os.Build.VERSION.SDK_INT < 31 || ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED, onRequestBluetoothPermission)
-        Text("AccessibilityService sa nevyžaduje. Kapsula používa vlastné dotykové gestá a samostatné systémové rozhrania.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(capsuleString(R.string.accessibility_detail), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
