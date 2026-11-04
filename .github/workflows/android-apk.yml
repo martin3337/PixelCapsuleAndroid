@@ -7,7 +7,7 @@ on:
       - 'PixelCapsuleAndroid/**'
       - '.github/workflows/android-apk.yml'
 
-# Pixel Capsule 1.0.1: keep only the newest build for this branch. The first build step also cancels
+# Pixel Capsule 1.0.1: build the latest corrected source only. The first build step also cancels
 # older queued runs created before this concurrency policy was added.
 concurrency:
   group: pixel-capsule-apk-${{ github.ref }}
