@@ -222,9 +222,9 @@ class CapsuleOverlayService : Service(), LifecycleOwner {
         val plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0)
         val source = when (plugged) {
             BatteryManager.BATTERY_PLUGGED_USB -> "USB"
-            BatteryManager.BATTERY_PLUGGED_AC -> "Adaptér"
-            BatteryManager.BATTERY_PLUGGED_WIRELESS -> "Bezdrôtovo"
-            else -> "Napájanie"
+            BatteryManager.BATTERY_PLUGGED_AC -> getString(R.string.charging_adapter)
+            BatteryManager.BATTERY_PLUGGED_WIRELESS -> getString(R.string.charging_wireless)
+            else -> getString(R.string.charging_source)
         }
         CapsuleRuntime.setBattery(if (level >= 0) (level * 100 / scale) else 0, charging, source)
     }
