@@ -14,6 +14,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -46,6 +47,7 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
     var notifications by remember { mutableStateOf(initial.showNotifications) }
     var controls by remember { mutableStateOf(initial.showControls) }
     var apps by remember { mutableStateOf(initial.showApps) }
+    var widgetText by remember { mutableStateOf(initial.widgetText) }
     var accent by remember { mutableStateOf(initial.accentColorArgb) }
     var tap by remember { mutableStateOf(initial.tapAction) }
     var doubleTap by remember { mutableStateOf(initial.doubleTapAction) }
@@ -68,6 +70,7 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
                 showNotifications = notifications,
                 showControls = controls,
                 showApps = apps,
+                widgetText = widgetText,
                 accentColorArgb = accent,
                 tapAction = tap,
                 doubleTapAction = doubleTap,
@@ -88,6 +91,23 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
         TextButton(onClick = onBack) { Text("← Späť") }
         Text("Prispôsobenie", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text("Jemne dolaď polohu, rozmery a obsah kapsuly. Poloha výrezu sa zisťuje z geometrie displeja automaticky.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+
+        Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
+            Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("Vlastný QR widget", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                Text("Vlož text alebo odkaz. Kapsula z neho vytvorí QR kód; v kapsule ho môžeš skopírovať alebo otvoriť odkaz.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                OutlinedTextField(
+                    value = widgetText,
+                    onValueChange = { widgetText = it.take(500); save() },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Text alebo URL") },
+                    placeholder = { Text("https://example.com") },
+                    minLines = 2,
+                    maxLines = 4
+                )
+                TextButton(onClick = { save(true) }) { Text("Uložiť a obnoviť kapsulu") }
+            }
+        }
 
         Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
