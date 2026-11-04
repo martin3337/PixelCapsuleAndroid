@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -89,52 +90,52 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         TextButton(onClick = onBack) { Text("← Späť") }
-        Text("Prispôsobenie", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.settings_title), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         Text("Jemne dolaď polohu, rozmery a obsah kapsuly. Poloha výrezu sa zisťuje z geometrie displeja automaticky.", color = MaterialTheme.colorScheme.onSurfaceVariant)
 
         Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Vlastný QR widget", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.qr_widget), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
                 Text("Vlož text alebo odkaz. Kapsula z neho vytvorí QR kód; v kapsule ho môžeš skopírovať alebo otvoriť odkaz.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
                 OutlinedTextField(
                     value = widgetText,
                     onValueChange = { widgetText = it.take(500); save() },
                     modifier = Modifier.fillMaxWidth(),
-                    label = { Text("Text alebo URL") },
+                    label = { Text(stringResource(R.string.text_or_url)) },
                     placeholder = { Text("https://example.com") },
                     minLines = 2,
                     maxLines = 4
                 )
-                TextButton(onClick = { save(true) }) { Text("Uložiť a obnoviť kapsulu") }
+                TextButton(onClick = { save(true) }) { Text(stringResource(R.string.save_restart)) }
             }
         }
 
         Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Text("Geometria", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                SliderSetting("Šírka zbalenej kapsuly", width, 104f..220f, { width = it; save() }, { save(true) }, "${width.toInt()} dp")
-                SliderSetting("Šírka rozbalenej kapsuly", expandedWidth, 260f..420f, { expandedWidth = it; save() }, { save(true) }, "${expandedWidth.toInt()} dp")
-                SliderSetting("Zaoblenie rohov", radius, 16f..48f, { radius = it; save() }, { save(true) }, "${radius.toInt()} dp")
-                SliderSetting("Posun do strán", offsetX, -120f..120f, { offsetX = it; save() }, { save(true) }, "${offsetX.toInt()} dp")
-                SliderSetting("Posun hore / dole", offsetY, -20f..100f, { offsetY = it; save() }, { save(true) }, "${offsetY.toInt()} dp")
+                Text(stringResource(R.string.geometry), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                SliderSetting(stringResource(R.string.collapsed_width), width, 104f..220f, { width = it; save() }, { save(true) }, "${width.toInt()} dp")
+                SliderSetting(stringResource(R.string.expanded_width), expandedWidth, 260f..420f, { expandedWidth = it; save() }, { save(true) }, "${expandedWidth.toInt()} dp")
+                SliderSetting(stringResource(R.string.corner_radius), radius, 16f..48f, { radius = it; save() }, { save(true) }, "${radius.toInt()} dp")
+                SliderSetting(stringResource(R.string.horizontal_offset), offsetX, -120f..120f, { offsetX = it; save() }, { save(true) }, "${offsetX.toInt()} dp")
+                SliderSetting(stringResource(R.string.vertical_offset), offsetY, -20f..100f, { offsetY = it; save() }, { save(true) }, "${offsetY.toInt()} dp")
             }
         }
 
         Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("Vzhľad a obsah", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                SwitchRow("Dynamické farby Material You", "Farby podľa systémovej tapety Androidu.", dynamic) { dynamic = it; save(true) }
-                SwitchRow("Multimediálny prehrávač", "Aktívna skladba a ovládanie MediaSession.", media) { media = it; save(true) }
-                SwitchRow("Notifikácie", "Upozornenia a dostupné rýchle odpovede.", notifications) { notifications = it; save(true) }
-                SwitchRow("Systémové ovládače", "Blesk, jas a hlasitosť.", controls) { controls = it; save(true) }
-                SwitchRow("Obľúbené aplikácie", "Skratky aplikácií v rozbalenej kapsule.", apps) { apps = it; save(true) }
+                Text(stringResource(R.string.appearance_content), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                SwitchRow(stringResource(R.string.dynamic_colors), stringResource(R.string.wallpaper_colors), dynamic) { dynamic = it; save(true) }
+                SwitchRow(stringResource(R.string.media_player), stringResource(R.string.active_track_controls), media) { media = it; save(true) }
+                SwitchRow(stringResource(R.string.notification_title), stringResource(R.string.notification_desc), notifications) { notifications = it; save(true) }
+                SwitchRow(stringResource(R.string.system_controls), stringResource(R.string.flashlight_brightness_volume), controls) { controls = it; save(true) }
+                SwitchRow(stringResource(R.string.favourite_apps), stringResource(R.string.favourite_apps_desc), apps) { apps = it; save(true) }
             }
         }
                 Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text("Farba kapsuly", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                Text("Vyber akcent pre indikátory, ikony a animácie.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                val palette = listOf("Zelená" to 0xFFB9D69A, "Modrá" to 0xFF9CCBFF, "Fialová" to 0xFFD0B6FF, "Ružová" to 0xFFFFB8D2, "Oranžová" to 0xFFFFC58A, "Tyrkysová" to 0xFF91D9D0)
+                Text(stringResource(R.string.capsule_colour), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.accent_desc), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
+                val palette = listOf(stringResource(R.string.green) to 0xFFB9D69A, stringResource(R.string.blue) to 0xFF9CCBFF, stringResource(R.string.purple) to 0xFFD0B6FF, stringResource(R.string.pink) to 0xFFFFB8D2, stringResource(R.string.orange) to 0xFFFFC58A, stringResource(R.string.turquoise) to 0xFF91D9D0)
                 palette.forEach { (name, value) ->
                     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                         androidx.compose.foundation.Canvas(Modifier.padding(end = 10.dp).size(22.dp)) { drawCircle(Color(value)) }
@@ -146,16 +147,16 @@ fun SettingsScreen(onBack: () -> Unit, onRestartOverlay: () -> Unit) {
         }
         Card(shape = androidx.compose.foundation.shape.RoundedCornerShape(26.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
             Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text("Vlastné gestá", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.custom_gestures), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
                 Text("Nastav akciu pre ťuknutie, dvojité ťuknutie, podržanie a všetky smery potiahnutia.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodySmall)
-                val actions = listOf("toggle" to "Rozbaliť / zbaliť", "expand" to "Rozbaliť kapsulu", "collapse" to "Zbaliť kapsulu", "next_section" to "Ďalšia sekcia", "previous_section" to "Predchádzajúca sekcia", "media" to "Otvoriť prehrávač", "notifications" to "Otvoriť upozornenia", "settings" to "Otvoriť nastavenia")
-                GestureSetting("Ťuknutie", tap, actions) { tap = it; save(true) }
-                GestureSetting("Dvojité ťuknutie", doubleTap, actions) { doubleTap = it; save(true) }
-                GestureSetting("Podržanie", longPress, actions) { longPress = it; save(true) }
-                GestureSetting("Potiahnutie doľava", swipeLeft, actions) { swipeLeft = it; save(true) }
-                GestureSetting("Potiahnutie doprava", swipeRight, actions) { swipeRight = it; save(true) }
-                GestureSetting("Potiahnutie hore", swipeUp, actions) { swipeUp = it; save(true) }
-                GestureSetting("Potiahnutie dole", swipeDown, actions) { swipeDown = it; save(true) }
+                val actions = listOf("toggle" to stringResource(R.string.gesture_toggle), "expand" to stringResource(R.string.gesture_expand), "collapse" to stringResource(R.string.gesture_collapse), "next_section" to stringResource(R.string.gesture_next), "previous_section" to stringResource(R.string.gesture_previous), "media" to stringResource(R.string.gesture_open_player), "notifications" to stringResource(R.string.gesture_open_notifications), "settings" to stringResource(R.string.gesture_open_settings))
+                GestureSetting(stringResource(R.string.gesture_tap), tap, actions) { tap = it; save(true) }
+                GestureSetting(stringResource(R.string.gesture_double_tap), doubleTap, actions) { doubleTap = it; save(true) }
+                GestureSetting(stringResource(R.string.gesture_long_press), longPress, actions) { longPress = it; save(true) }
+                GestureSetting(stringResource(R.string.gesture_swipe_left), swipeLeft, actions) { swipeLeft = it; save(true) }
+                GestureSetting(stringResource(R.string.gesture_swipe_right), swipeRight, actions) { swipeRight = it; save(true) }
+                GestureSetting(stringResource(R.string.gesture_swipe_up), swipeUp, actions) { swipeUp = it; save(true) }
+                GestureSetting(stringResource(R.string.gesture_swipe_down), swipeDown, actions) { swipeDown = it; save(true) }
             }
         }
         Text("Poznámka: Android vykresľuje systémový stavový riadok nad aplikačnými overlay oknami. Kapsula sa preto zarovnáva podľa výrezu a zobrazuje sa v jeho dostupnej oblasti; nemôže nahradiť systémový stavový riadok.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
