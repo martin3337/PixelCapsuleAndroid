@@ -178,4 +178,27 @@
     <string name="remove">Remove</string>
     <string name="no_favourite_apps">No app shortcuts selected yet. Open settings and add apps to the capsule.</string>
     <string name="back_arrow">Back</string>
+    <string name="flashlight_first_use">Camera permission is needed the first time you turn on the LED flash.</string>
+    <string name="bluetooth_permission_desc">Optional access to battery levels for supported headphones and accessories.</string>
+    <string name="notifications_permission_detail">Notification text and quick-reply actions.</string>
+    <string name="phone_permission_detail">SIM call status; answering or rejecting requires a separate permission.</string>
+    <string name="accessibility_detail">AccessibilityService is not required. The capsule uses its own touch gestures and Android system interfaces.</string>
+    <string name="settings_intro_full">Fine-tune the capsule position, size and content. The display cutout position is detected automatically from display geometry.</string>
+    <string name="qr_widget_desc_full">Enter text or a link. The capsule creates a QR code that you can copy or open from the capsule.</string>
+    <string name="gestures_desc_full">Set the action for a tap, double tap, long press and every swipe direction.</string>
+    <string name="overlay_note_full">Note: Android draws the system status bar above application overlays. The capsule aligns with the display cutout and stays within the available area; it cannot replace the system status bar.</string>
+    <string name="overview_title">Your quick overview</string>
+    <string name="connected_percent">Connected • %1$d%%</string>
+    <string name="download_progress">Download • %1$d%%</string>
+    <string name="empty_notifications">There are no notifications here yet. New events appear after notification access is enabled.</string>
+    <string name="torch_failed">Could not control the flashlight</string>
+    <string name="auto_brightness_failed">Could not change automatic brightness</string>
+    <string name="system_panel_description_full">Opens Android system panels. Availability depends on the Android version and phone manufacturer.</string>
+    <string name="qr_title_short">Your QR code</string>
+    <string name="empty_favourite_apps">No app shortcuts selected yet. Long-press the capsule to open settings and add apps.</string>
+    <string name="charging_adapter">AC adapter</string>
+    <string name="charging_wireless">Wireless charging</string>
+    <string name="charging_source">Power</string>
+    <string name="previous">Previous</string>
+    <string name="next">Next</string>
 </resources>
