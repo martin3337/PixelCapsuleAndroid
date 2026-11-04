@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -116,7 +117,7 @@ private fun HomeScreen(
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.weight(1f)) {
                 Text("Pixel Capsule", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-                Text("Tvoj interaktívny ostrov pre Android", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(stringResource(R.string.home_subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
             Surface(shape = RoundedCornerShape(18.dp), color = MaterialTheme.colorScheme.primaryContainer) {
                 Icon(Icons.Default.Bolt, contentDescription = null, tint = MaterialTheme.colorScheme.onPrimaryContainer, modifier = Modifier.padding(13.dp).size(28.dp))
@@ -129,65 +130,65 @@ private fun HomeScreen(
             Button(onClick = onStartOverlay, enabled = overlayGranted, modifier = Modifier.weight(1f)) {
                 Icon(Icons.Default.Bolt, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.size(8.dp))
-                Text("Zapnúť kapsulu")
+                Text(stringResource(R.string.start_capsule))
             }
-            OutlinedButton(onClick = onStopOverlay, modifier = Modifier.weight(1f)) { Text("Vypnúť") }
+            OutlinedButton(onClick = onStopOverlay, modifier = Modifier.weight(1f)) { Text(stringResource(R.string.stop_capsule)) }
         }
         if (!overlayGranted) {
-            Text("Najprv povoľ zobrazenie nad ostatnými aplikáciami.", color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+            Text(stringResource(R.string.overlay_hint), color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
         }
 
-        Text("Rýchle nastavenie", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.quick_setup), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            QuickActionCard("Vzhľad", "Poloha, veľkosť a farby", Icons.Default.Tune, onSettings, Modifier.weight(1f))
-            QuickActionCard("Aplikácie", "Tvoje obľúbené skratky", Icons.Default.Apps, onApps, Modifier.weight(1f))
+            QuickActionCard(stringResource(R.string.appearance), stringResource(R.string.position_size_colors), Icons.Default.Tune, onSettings, Modifier.weight(1f))
+            QuickActionCard(stringResource(R.string.apps), stringResource(R.string.favourite_shortcuts), Icons.Default.Apps, onApps, Modifier.weight(1f))
         }
 
         OutlinedButton(onClick = onPickContact, modifier = Modifier.fillMaxWidth()) {
             Icon(Icons.Default.Apps, contentDescription = null, modifier = Modifier.size(18.dp))
             Spacer(Modifier.size(8.dp))
-            Text("Pridať kontakt do kapsuly")
+            Text(stringResource(R.string.add_contact))
         }
 
-        Text("Oprávnenia", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        Text(stringResource(R.string.permissions), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         PermissionStatusCard(
-            title = "Zobrazenie nad aplikáciami",
-            description = "Zobrazí kapsulu nad otvorenými aplikáciami.",
+            title = stringResource(R.string.overlay_access),
+            description = stringResource(R.string.overlay_access_desc),
             granted = overlayGranted,
             onClick = { MainActivity.openOverlaySettings(context) }
         )
         PermissionStatusCard(
-            title = "Prístup k notifikáciám a médiám",
-            description = "Číta notifikácie a nájde aktívne prehrávače.",
+            title = stringResource(R.string.notification_access),
+            description = stringResource(R.string.notification_access_desc),
             granted = notificationGranted,
             onClick = { MainActivity.openNotificationSettings(context) }
         )
         PermissionStatusCard(
-            title = "Úprava systémových nastavení",
-            description = "Umožní meniť jas displeja.",
+            title = stringResource(R.string.modify_settings),
+            description = stringResource(R.string.brightness_desc),
             granted = writeGranted,
             onClick = { MainActivity.openWriteSettings(context) }
         )
         PermissionStatusCard(
-            title = "Hovory",
+            title = stringResource(R.string.calls),
             description = "Stav hovoru a dostupné ovládanie hovoru.",
             granted = ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED,
             onClick = onRequestCallPermissions
         )
         PermissionStatusCard(
-            title = "Baterka",
+            title = stringResource(R.string.flashlight),
             description = "Vyžaduje povolenie fotoaparátu iba pri prvom zapnutí blesku.",
             granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED,
             onClick = onRequestCameraPermission
         )
         PermissionStatusCard(
-            title = "Bluetooth príslušenstvo",
+            title = stringResource(R.string.bluetooth_accessory),
             description = "Voliteľné povolenie na zobrazenie úrovne batérie podporovaných slúchadiel a zariadení.",
             granted = android.os.Build.VERSION.SDK_INT < 31 || ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED,
             onClick = onRequestBluetoothPermission
         )
         TextButton(onClick = onPermissions, modifier = Modifier.align(Alignment.End)) {
-            Text("Sprievodca oprávneniami")
+            Text(stringResource(R.string.permission_guide))
             Icon(Icons.Default.ChevronRight, contentDescription = null)
         }
         Text(
@@ -208,7 +209,7 @@ private fun CapsulePreviewCard() {
     ) {
         Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("NÁHĽAD KAPSULY", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.capsule_preview), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.weight(1f))
                 Text("MATERIAL 3", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
             }
@@ -223,7 +224,7 @@ private fun CapsulePreviewCard() {
                         Spacer(Modifier.size(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
                             Text("Pixel Capsule", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                            Text("Všetko dôležité na jednom mieste", color = Color(0xFFBCC7B7), fontSize = 10.sp)
+                            Text(stringResource(R.string.preview_tagline), color = Color(0xFFBCC7B7), fontSize = 10.sp)
                         }
                         Row(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.Bottom) {
                             listOf(9, 17, 12, 20).forEachIndexed { index, height ->
@@ -233,7 +234,7 @@ private fun CapsulePreviewCard() {
                     }
                 }
             }
-            Text("Kapsula sa prispôsobí aktívnej hudbe, upozorneniam, hovorom aj rýchlym ovládačom.", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+            Text(stringResource(R.string.preview_description), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -259,7 +260,7 @@ private fun PermissionStatusCard(title: String, description: String, granted: Bo
             }
             Icon(
                 if (granted) Icons.Default.CheckCircle else Icons.Default.ChevronRight,
-                contentDescription = if (granted) "Povolené" else "Otvoriť nastavenie",
+                contentDescription = if (granted) stringResource(R.string.granted) else stringResource(R.string.open_setting),
                 tint = if (granted) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -275,15 +276,15 @@ fun PermissionsScreen(onBack: () -> Unit, onRequestCallPermissions: () -> Unit, 
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             TextButton(onClick = onBack) { Text("← Späť") }
-            Text("Sprievodca oprávneniami", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.permission_guide), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
         }
-        Text("Zapni iba tie prístupy, ktoré chceš používať. Každý prístup môžeš neskôr odobrať v nastaveniach Androidu.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-        PermissionStatusCard("Overlay", "Plávajúca kapsula na obrazovke.", overlayGranted, { MainActivity.openOverlaySettings(context) })
-        PermissionStatusCard("Notifikácie", "Texty upozornení a akcie rýchlej odpovede.", notificationGranted, { MainActivity.openNotificationSettings(context) })
-        PermissionStatusCard("Systémové nastavenia", "Manuálny jas displeja a automatický režim.", writeGranted, { MainActivity.openWriteSettings(context) })
-        PermissionStatusCard("Telefón", "Stav SIM hovoru; pri prijatí/odmietnutí je potrebné samostatné povolenie.", ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED, onRequestCallPermissions)
-        PermissionStatusCard("Fotoaparát / blesk", "Povolenie sa používa iba pri ovládaní LED blesku.", ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED, onRequestCameraPermission)
-        PermissionStatusCard("Bluetooth príslušenstvo", "Voliteľný prístup k úrovni batérie podporovaných zariadení.", android.os.Build.VERSION.SDK_INT < 31 || ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED, onRequestBluetoothPermission)
+        Text(stringResource(R.string.permission_guide_desc), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        PermissionStatusCard(stringResource(R.string.overlay), stringResource(R.string.floating_capsule), overlayGranted, { MainActivity.openOverlaySettings(context) })
+        PermissionStatusCard(stringResource(R.string.notifications), "Texty upozornení a akcie rýchlej odpovede.", notificationGranted, { MainActivity.openNotificationSettings(context) })
+        PermissionStatusCard(stringResource(R.string.system_settings), stringResource(R.string.brightness_auto), writeGranted, { MainActivity.openWriteSettings(context) })
+        PermissionStatusCard(stringResource(R.string.phone), "Stav SIM hovoru; pri prijatí/odmietnutí je potrebné samostatné povolenie.", ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(context, Manifest.permission.ANSWER_PHONE_CALLS) == PackageManager.PERMISSION_GRANTED, onRequestCallPermissions)
+        PermissionStatusCard(stringResource(R.string.camera_flash), stringResource(R.string.camera_flash_desc), ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED, onRequestCameraPermission)
+        PermissionStatusCard(stringResource(R.string.bluetooth_accessory), stringResource(R.string.bluetooth_accessory_desc), android.os.Build.VERSION.SDK_INT < 31 || ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED, onRequestBluetoothPermission)
         Text("AccessibilityService sa nevyžaduje. Kapsula používa vlastné dotykové gestá a samostatné systémové rozhrania.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
