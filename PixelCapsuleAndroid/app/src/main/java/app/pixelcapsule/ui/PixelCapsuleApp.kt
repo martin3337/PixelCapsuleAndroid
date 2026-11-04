@@ -128,7 +128,7 @@ private fun HomeScreen(
             }
         }
 
-        CapsulePreviewCard()
+        CapsuleStatusCard(overlayGranted = overlayGranted, notificationsGranted = notificationGranted)
 
         Row(horizontalArrangement = Arrangement.spacedBy(10.dp), modifier = Modifier.fillMaxWidth()) {
             Button(onClick = onStartOverlay, enabled = overlayGranted, modifier = Modifier.weight(1f)) {
@@ -204,41 +204,95 @@ private fun HomeScreen(
 }
 
 @Composable
-private fun CapsulePreviewCard() {
+private fun CapsuleStatusCard(overlayGranted: Boolean, notificationsGranted: Boolean) {
+    val completed = (if (overlayGranted) 1 else 0) + (if (notificationsGranted) 1 else 0)
+    val ready = completed == 2
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(30.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(13.dp)
+        ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(capsuleString(R.string.capsule_preview), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
-                Spacer(Modifier.weight(1f))
-                Text("MATERIAL 3", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
-            }
-            Box(modifier = Modifier.fillMaxWidth().height(112.dp), contentAlignment = Alignment.TopCenter) {
+                Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Text(
+                        capsuleString(R.string.setup_status),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        capsuleString(if (ready) R.string.setup_ready else R.string.setup_incomplete),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        capsuleString(R.string.setup_status_description),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
                 Surface(
-                    modifier = Modifier.padding(top = 6.dp).fillMaxWidth(0.68f).height(76.dp),
-                    color = Color(0xFF101511),
-                    shape = RoundedCornerShape(40.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    color = MaterialTheme.colorScheme.primaryContainer
                 ) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(horizontal = 16.dp)) {
-                        Box(Modifier.size(10.dp).clip(RoundedCornerShape(50)).background(Color(0xFFB9D69A)))
-                        Spacer(Modifier.size(12.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("Pixel Capsule", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
-                            Text(capsuleString(R.string.preview_tagline), color = Color(0xFFBCC7B7), fontSize = 10.sp)
-                        }
-                        Row(horizontalArrangement = Arrangement.spacedBy(3.dp), verticalAlignment = Alignment.Bottom) {
-                            listOf(9, 17, 12, 20).forEachIndexed { index, height ->
-                                Box(Modifier.size(width = 3.dp, height = height.dp).clip(RoundedCornerShape(3.dp)).background(Color(0xFFB9D69A)))
-                            }
-                        }
-                    }
+                    Icon(
+                        if (ready) Icons.Default.CheckCircle else Icons.Default.Bolt,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.padding(14.dp).size(30.dp)
+                    )
                 }
             }
-            Text(capsuleString(R.string.preview_description), color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+            androidx.compose.material3.LinearProgressIndicator(
+                progress = { completed / 2f },
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                SetupStatusChip(
+                    label = capsuleString(R.string.overlay_access),
+                    enabled = overlayGranted
+                )
+                SetupStatusChip(
+                    label = capsuleString(R.string.notification_access),
+                    enabled = notificationsGranted
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun SetupStatusChip(label: String, enabled: Boolean) {
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = if (enabled) MaterialTheme.colorScheme.primaryContainer
+        else MaterialTheme.colorScheme.surfaceVariant
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 11.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+        ) {
+            Icon(
+                if (enabled) Icons.Default.CheckCircle else Icons.Default.ChevronRight,
+                contentDescription = null,
+                tint = if (enabled) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(14.dp)
+            )
+            Text(
+                label,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (enabled) MaterialTheme.colorScheme.onPrimaryContainer
+                else MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
