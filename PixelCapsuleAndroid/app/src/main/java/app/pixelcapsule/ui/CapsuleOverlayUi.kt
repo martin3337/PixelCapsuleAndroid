@@ -1,6 +1,7 @@
 package app.pixelcapsule.ui
 
 import android.media.AudioManager
+import android.graphics.Bitmap
 import android.media.audiofx.AudioEffect
 import android.content.Intent
 import android.net.Uri
@@ -99,10 +100,12 @@ import app.pixelcapsule.core.formatDuration
 import app.pixelcapsule.system.AppCatalog
 import app.pixelcapsule.system.DeviceControls
 import kotlinx.coroutines.delay
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
 import kotlin.math.abs
 
 private enum class CapsuleSection(val label: String) {
-    OVERVIEW("Prehľad"), MEDIA("Hudba"), NOTIFICATIONS("Upozornenia"), CONTROLS("Ovládanie"), APPS("Aplikácie"), SYSTEM("Systém"), CONTACTS("Kontakty")
+    OVERVIEW("Prehľad"), MEDIA("Hudba"), NOTIFICATIONS("Upozornenia"), CONTROLS("Ovládanie"), APPS("Aplikácie"), SYSTEM("Systém"), WIDGET("QR widget"), CONTACTS("Kontakty")
 }
 
 @Composable
@@ -123,6 +126,7 @@ fun CapsuleOverlayUi(
         if (preferences.showControls) add(CapsuleSection.CONTROLS)
         if (preferences.showApps) add(CapsuleSection.APPS)
         add(CapsuleSection.SYSTEM)
+        if (preferences.widgetText.isNotBlank()) add(CapsuleSection.WIDGET)
         add(CapsuleSection.CONTACTS)
     }
     fun performGesture(action: String) {
@@ -131,8 +135,8 @@ fun CapsuleOverlayUi(
             "expand" -> expanded = true
             "collapse" -> expanded = false
             "settings" -> onOpenSettings()
-            "media" -> { section = CapsuleSection.MEDIA; expanded = true }
-            "notifications" -> { section = CapsuleSection.NOTIFICATIONS; expanded = true }
+            "media" -> if (preferences.showMedia) { section = CapsuleSection.MEDIA; expanded = true }
+            "notifications" -> if (preferences.showNotifications) { section = CapsuleSection.NOTIFICATIONS; expanded = true }
             "next_section" -> { val current = enabledSections.indexOf(section).coerceAtLeast(0); section = enabledSections[(current + 1) % enabledSections.size]; expanded = true }
             "previous_section" -> { val current = enabledSections.indexOf(section).coerceAtLeast(0); section = enabledSections[(current - 1 + enabledSections.size) % enabledSections.size]; expanded = true }
         }
@@ -180,6 +184,7 @@ fun CapsuleOverlayUi(
                     ExpandedCapsule(
                         section = section,
                         sections = enabledSections,
+                        widgetText = preferences.widgetText,
                         onSection = { section = it },
                         snapshotMedia = snapshot.media,
                         notifications = if (preferences.showNotifications) snapshot.notifications else emptyList(),
@@ -302,6 +307,7 @@ private fun EqualizerBars(playing: Boolean, color: Color) {
 private fun ExpandedCapsule(
     section: CapsuleSection,
     sections: List<CapsuleSection>,
+    widgetText: String,
     onSection: (CapsuleSection) -> Unit,
     snapshotMedia: MediaInfo?,
     notifications: List<NotificationInfo>,
@@ -345,6 +351,7 @@ private fun ExpandedCapsule(
                         section == CapsuleSection.CONTROLS -> "Rýchle ovládače"
                         section == CapsuleSection.APPS -> "Obľúbené aplikácie"
                         section == CapsuleSection.SYSTEM -> "Systémové skratky"
+                        section == CapsuleSection.WIDGET -> "Vlastný QR widget"
                         section == CapsuleSection.CONTACTS -> "Kontakty"
                         else -> "Tvoj okamžitý prehľad"
                     },
@@ -370,6 +377,7 @@ private fun ExpandedCapsule(
                                 CapsuleSection.CONTROLS -> Icons.Default.Brightness6
                                 CapsuleSection.APPS -> Icons.Default.Apps
                                 CapsuleSection.SYSTEM -> Icons.Default.Settings
+                                CapsuleSection.WIDGET -> Icons.Default.Info
                                 CapsuleSection.CONTACTS -> Icons.Default.Call
                                 CapsuleSection.OVERVIEW -> Icons.Default.Info
                             }, null, modifier = Modifier.size(14.dp)
@@ -385,6 +393,7 @@ private fun ExpandedCapsule(
             CapsuleSection.CONTROLS -> ControlsPanel(green, muted)
             CapsuleSection.APPS -> FavouriteAppsPanel(muted, quickApps)
             CapsuleSection.SYSTEM -> SystemShortcutsPanel(muted)
+            CapsuleSection.WIDGET -> CustomQrWidgetPanel(widgetText, green, muted)
             CapsuleSection.CONTACTS -> ContactsPanel(muted)
         }
         Text("Potiahni do strán na prepnutie • podrž na nastavenia", color = muted, fontSize = 9.sp, modifier = Modifier.align(Alignment.CenterHorizontally))
@@ -758,6 +767,52 @@ private fun SystemShortcutsPanel(muted: Color) {
                     }
                 }
                 if (rowItems.size == 1) Spacer(Modifier.weight(1f))
+            }
+        }
+    }
+}
+
+@Composable
+private fun CustomQrWidgetPanel(text: String, green: Color, muted: Color) {
+    val context = LocalContext.current
+    val bitmap = remember(text) {
+        runCatching {
+            val matrix = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, 280, 280)
+            Bitmap.createBitmap(280, 280, Bitmap.Config.ARGB_8888).apply {
+                for (x in 0 until 280) {
+                    for (y in 0 until 280) {
+                        setPixel(x, y, if (matrix[x, y]) android.graphics.Color.BLACK else android.graphics.Color.WHITE)
+                    }
+                }
+            }
+        }.getOrNull()
+    }
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(9.dp)
+    ) {
+        Text("Tvoj vlastný QR kód", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
+        if (bitmap != null) {
+            Surface(color = Color.White, shape = RoundedCornerShape(18.dp)) {
+                Image(bitmap.asImageBitmap(), contentDescription = "Vlastný QR kód", modifier = Modifier.padding(10.dp).size(190.dp))
+            }
+        } else {
+            Text("QR kód sa nepodarilo vytvoriť. Skontroluj text v nastaveniach.", color = muted, fontSize = 10.sp)
+        }
+        Text(text, color = muted, fontSize = 10.sp, maxLines = 3, overflow = TextOverflow.Ellipsis)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TextButton(onClick = {
+                val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Pixel Capsule widget", text))
+                Toast.makeText(context, "Text skopírovaný", Toast.LENGTH_SHORT).show()
+            }) { Text("Kopírovať", color = green, fontSize = 10.sp) }
+            val uri = runCatching { Uri.parse(text) }.getOrNull()
+            if (uri?.scheme == "https" || uri?.scheme == "http") {
+                TextButton(onClick = {
+                    runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
+                        .onFailure { Toast.makeText(context, "Odkaz sa nepodarilo otvoriť", Toast.LENGTH_SHORT).show() }
+                }) { Text("Otvoriť odkaz", color = green, fontSize = 10.sp) }
             }
         }
     }
