@@ -25,6 +25,10 @@ import android.bluetooth.BluetoothDevice
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.compose.ui.platform.ComposeView
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.ViewTreeLifecycleOwner
 import app.pixelcapsule.MainActivity
 import app.pixelcapsule.R
 import app.pixelcapsule.core.CapsulePrefs
@@ -32,7 +36,9 @@ import app.pixelcapsule.core.CapsuleRuntime
 import app.pixelcapsule.ui.CapsuleOverlayUi
 import app.pixelcapsule.ui.PixelCapsuleTheme
 
-class CapsuleOverlayService : Service() {
+class CapsuleOverlayService : Service(), LifecycleOwner {
+    private val serviceLifecycle by lazy { LifecycleRegistry(this) }
+    override val lifecycle: Lifecycle get() = serviceLifecycle
     private lateinit var windowManager: WindowManager
     private var overlayView: ComposeView? = null
     private var overlayParams: LayoutParams? = null
@@ -56,11 +62,13 @@ class CapsuleOverlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        serviceLifecycle.currentState = Lifecycle.State.CREATED
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
         createNotificationChannel()
         startAsForeground()
         registerDeviceReceivers()
         registerPhoneState()
+        serviceLifecycle.currentState = Lifecycle.State.STARTED
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -91,11 +99,11 @@ class CapsuleOverlayService : Service() {
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(getString(R.string.overlay_running))
-            .setContentText("Ťuknutím otvoríte nastavenia kapsuly")
+            .setContentText("Tap to open Pixel Capsule settings")
             .setContentIntent(openApp)
             .setOngoing(true)
             .setCategory(Notification.CATEGORY_SERVICE)
-            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Vypnúť", stop)
+            .addAction(android.R.drawable.ic_menu_close_clear_cancel, "Turn off", stop)
             .build()
         if (Build.VERSION.SDK_INT >= 34) {
             startForeground(NOTIFICATION_ID, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
@@ -118,6 +126,9 @@ class CapsuleOverlayService : Service() {
     private fun addOverlay() {
         val prefs = CapsulePrefs.read(this)
         val view = ComposeView(this).apply {
+            // Service views have no Activity decor tree. Attach an explicit lifecycle owner
+            // before Compose creates its composition to avoid an overlay attach crash.
+            ViewTreeLifecycleOwner.set(this, this@CapsuleOverlayService)
             setContent {
                 PixelCapsuleTheme(dynamicColors = prefs.dynamicColors) {
                     CapsuleOverlayUi(
@@ -249,6 +260,7 @@ class CapsuleOverlayService : Service() {
     private fun dp(value: Float): Int = (value * resources.displayMetrics.density).toInt()
 
     override fun onDestroy() {
+        serviceLifecycle.currentState = Lifecycle.State.DESTROYED
         removeOverlay()
         if (receiverRegistered) runCatching { unregisterReceiver(stateReceiver) }
         receiverRegistered = false
