@@ -56,6 +56,7 @@ fun PixelCapsuleApp(
     onStopOverlay: () -> Unit,
     onRequestCallPermissions: () -> Unit,
     onRequestCameraPermission: () -> Unit,
+    onRequestBluetoothPermission: () -> Unit,
     onPickContact: () -> Unit,
     permissionRefreshKey: Int
 ) {
@@ -71,6 +72,7 @@ fun PixelCapsuleApp(
                 onPermissions = { page = AppPage.PERMISSIONS },
                 onRequestCallPermissions = onRequestCallPermissions,
                 onRequestCameraPermission = onRequestCameraPermission,
+                onRequestBluetoothPermission = onRequestBluetoothPermission,
                 onPickContact = onPickContact,
                 permissionRefreshKey = permissionRefreshKey
             )
@@ -80,6 +82,7 @@ fun PixelCapsuleApp(
                 onBack = { page = AppPage.HOME },
                 onRequestCallPermissions = onRequestCallPermissions,
                 onRequestCameraPermission = onRequestCameraPermission,
+                onRequestBluetoothPermission = onRequestBluetoothPermission,
                 permissionRefreshKey = permissionRefreshKey
             )
         }
@@ -97,6 +100,7 @@ private fun HomeScreen(
     onPermissions: () -> Unit,
     onRequestCallPermissions: () -> Unit,
     onRequestCameraPermission: () -> Unit,
+    onRequestBluetoothPermission: () -> Unit,
     onPickContact: () -> Unit,
     permissionRefreshKey: Int
 ) {
@@ -174,6 +178,12 @@ private fun HomeScreen(
             description = "Vyžaduje povolenie fotoaparátu iba pri prvom zapnutí blesku.",
             granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED,
             onClick = onRequestCameraPermission
+        )
+        PermissionStatusCard(
+            title = "Bluetooth príslušenstvo",
+            description = "Voliteľné povolenie na zobrazenie úrovne batérie podporovaných slúchadiel a zariadení.",
+            granted = android.os.Build.VERSION.SDK_INT < 31 || ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED,
+            onClick = onRequestBluetoothPermission
         )
         TextButton(onClick = onPermissions, modifier = Modifier.align(Alignment.End)) {
             Text("Sprievodca oprávneniami")
@@ -256,7 +266,7 @@ private fun PermissionStatusCard(title: String, description: String, granted: Bo
 }
 
 @Composable
-fun PermissionsScreen(onBack: () -> Unit, onRequestCallPermissions: () -> Unit, onRequestCameraPermission: () -> Unit, permissionRefreshKey: Int) {
+fun PermissionsScreen(onBack: () -> Unit, onRequestCallPermissions: () -> Unit, onRequestCameraPermission: () -> Unit, onRequestBluetoothPermission: () -> Unit, permissionRefreshKey: Int) {
     val context = LocalContext.current
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -269,6 +279,7 @@ fun PermissionsScreen(onBack: () -> Unit, onRequestCallPermissions: () -> Unit, 
         PermissionStatusCard("Systémové nastavenia", "Manuálny jas displeja a automatický režim.", Settings.System.canWrite(context), { MainActivity.openWriteSettings(context) })
         PermissionStatusCard("Telefón", "Stav SIM hovoru; pri prijatí/odmietnutí je potrebné samostatné povolenie.", ContextCompat.checkSelfPermission(context, Manifest.permission.READ_PHONE_STATE) == PackageManager.PERMISSION_GRANTED, onRequestCallPermissions)
         PermissionStatusCard("Fotoaparát / blesk", "Povolenie sa používa iba pri ovládaní LED blesku.", ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED, onRequestCameraPermission)
+        PermissionStatusCard("Bluetooth príslušenstvo", "Voliteľný prístup k úrovni batérie podporovaných zariadení.", android.os.Build.VERSION.SDK_INT < 31 || ContextCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED, onRequestBluetoothPermission)
         Text("AccessibilityService sa nevyžaduje. Kapsula používa vlastné dotykové gestá a samostatné systémové rozhrania.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
