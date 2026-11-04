@@ -25,6 +25,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 /**
+ * Pixel Capsule 1.0.2 system language pipeline.
  * UI translations are resolved from Android resources first (English fallback and
  * native Slovak strings). Other supported system languages are translated on-device
  * with ML Kit. Translation model downloads are requested only on Wi-Fi.
