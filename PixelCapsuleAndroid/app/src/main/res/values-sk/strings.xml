@@ -50,7 +50,6 @@
     <string name="overlay_running">Pixel Capsule je aktívna</string>
     <string name="overlay_notification_text">Ťuknutím otvoríte nastavenia kapsuly</string>
     <string name="turn_off">Vypnúť</string>
-    <string name="back">Späť</string>
     <string name="settings_title">Prispôsobenie</string>
     <string name="settings_intro">Jemne dolaď polohu, rozmery a obsah kapsuly. Poloha výrezu sa zisťuje automaticky z geometrie displeja.</string>
     <string name="qr_widget">Vlastný QR widget</string>
@@ -178,4 +177,5 @@
     <string name="no_contacts">Zatiaľ nemáš pridané kontakty. V aplikácii Pixel Capsule vyber možnosť Pridať kontakt do kapsuly.</string>
     <string name="remove">Odobrať</string>
     <string name="no_favourite_apps">Zatiaľ nemáš vybrané skratky. Otvor nastavenia a pridaj aplikácie do kapsuly.</string>
+    <string name="back_arrow">Späť</string>
 </resources>
