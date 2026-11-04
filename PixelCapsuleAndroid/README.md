@@ -17,7 +17,7 @@ Samostatná Android aplikácia v Kotlin + Jetpack Compose. Projekt je nezávisl�
 
 1. Otvor priečinok `PixelCapsuleAndroid` v aktuálnom Android Studio.
 2. Použi JDK 17 a Gradle 9.5.0 (požiadavka AGP 9.3.1).
-3. Nainštaluj Android SDK Platform 37 a SDK Build Tools 36.0.0.
+3. Nainštaluj Android SDK Platform 36 a SDK Build Tools 36.0.0.
 4. Synchronizuj Gradle a spusti `app` na zariadení alebo emulátore s Androidom 8.0+.
 5. APK zostavíš cez **Build → Build Bundle(s) / APK(s) → Build APK(s)**. Pri príkazovom riadku použi `gradle :app:assembleDebug`, keď máš nainštalovaný Gradle 9.5.0.
 

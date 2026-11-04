@@ -6,7 +6,7 @@ plugins {
 
 android {
     namespace = "app.pixelcapsule"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "app.pixelcapsule"

@@ -61,7 +61,7 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | sdkmanager --licenses || true
       - name: Install Android SDK platform
-        run: sdkmanager "platforms;android-37" "build-tools;36.0.0"
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
       - name: Build debug APK
         working-directory: PixelCapsuleAndroid
         run: gradle --no-daemon assembleDebug
