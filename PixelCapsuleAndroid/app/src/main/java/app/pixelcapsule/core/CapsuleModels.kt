@@ -49,7 +49,9 @@ data class CapsuleUiState(
     val call: CallInfo = CallInfo(),
     val batteryPercent: Int = -1,
     val isCharging: Boolean = false,
+    val chargingSource: String = "",
     val bluetoothConnected: Boolean = false,
+    val bluetoothBatteryPercent: Int? = null,
     val downloadPercent: Int? = null,
     val quickApps: Set<String> = emptySet()
 )
