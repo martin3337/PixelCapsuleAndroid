@@ -449,13 +449,13 @@ private fun CallCard(call: CallInfo, green: Color) {
             if (call.isRinging) {
                 IconButton(onClick = {
                     DeviceControls.answerOrRejectCall(context, true).onFailure {
-                        Toast.makeText(context, it.message ?: capsuleString(R.string.call_answer_failed), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, it.message ?: context.getString(R.string.call_answer_failed), Toast.LENGTH_SHORT).show()
                     }
                 }) { Icon(Icons.Default.Call, contentDescription = capsuleString(R.string.answer_call), tint = green) }
             }
             IconButton(onClick = {
                 DeviceControls.answerOrRejectCall(context, false).onFailure {
-                    Toast.makeText(context, it.message ?: capsuleString(R.string.call_end_failed), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, it.message ?: context.getString(R.string.call_end_failed), Toast.LENGTH_SHORT).show()
                 }
             }) { Icon(Icons.Default.CallEnd, contentDescription = capsuleString(R.string.end_or_reject_call), tint = Color(0xFFFF8A80)) }
         }
@@ -604,10 +604,10 @@ private fun MediaPanel(media: MediaInfo?, green: Color, muted: Color) {
             }
             if (intent.resolveActivity(context.packageManager) != null) {
                 runCatching { context.startActivity(intent) }.onFailure {
-                    Toast.makeText(context, capsuleString(R.string.equalizer_failed), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.equalizer_failed), Toast.LENGTH_SHORT).show()
                 }
             } else {
-                Toast.makeText(context, capsuleString(R.string.equalizer_unavailable), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.equalizer_unavailable), Toast.LENGTH_SHORT).show()
             }
         }) {
             Text(capsuleString(R.string.open_equalizer), color = green, fontSize = 10.sp)
@@ -672,7 +672,7 @@ private fun NotificationReply(item: NotificationInfo, onFocusableChanged: (Boole
             )
             IconButton(onClick = {
                 val sent = CapsuleRuntime.sendQuickReply(context, item.key, message)
-                Toast.makeText(context, if (sent) capsuleString(R.string.reply_sent) else capsuleString(R.string.quick_reply_unavailable), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, if (sent) context.getString(R.string.reply_sent) else context.getString(R.string.quick_reply_unavailable), Toast.LENGTH_SHORT).show()
                 message = ""
                 replying = false
                 onFocusableChanged(false)
@@ -697,7 +697,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
             if (torch == null) return@ControlRow
             val next = !torchOn
             DeviceControls.setTorch(context, next, torchStrength.toInt()).onSuccess { torchOn = next }.onFailure {
-                Toast.makeText(context, it.message ?: capsuleString(R.string.torch_failed), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, it.message ?: context.getString(R.string.torch_failed), Toast.LENGTH_SHORT).show()
             }
         }
         if (torch != null && torch.maxStrength > 1) {
@@ -740,7 +740,7 @@ private fun ControlsPanel(green: Color, muted: Color) {
             )
             TextButton(onClick = {
                 DeviceControls.setAutoBrightness(context, !autoBrightness).onSuccess { autoBrightness = !autoBrightness }.onFailure {
-                    Toast.makeText(context, it.message ?: capsuleString(R.string.auto_brightness_failed), Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, it.message ?: context.getString(R.string.auto_brightness_failed), Toast.LENGTH_SHORT).show()
                     MainActivity.openWriteSettings(context)
                 }
             }) { Text(if (autoBrightness) capsuleString(R.string.switch_manual_brightness) else capsuleString(R.string.enable_auto_brightness), fontSize = 10.sp, color = green) }
@@ -799,7 +799,7 @@ private fun SystemShortcutsPanel(muted: Color) {
                                 runCatching {
                                     context.startActivity(Intent(android.provider.Settings.ACTION_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
                                 }
-                                Toast.makeText(context, capsuleString(R.string.system_panel_unavailable), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, context.getString(R.string.system_panel_unavailable), Toast.LENGTH_SHORT).show()
                             }
                         },
                         modifier = Modifier.weight(1f),
@@ -848,13 +848,13 @@ private fun CustomQrWidgetPanel(text: String, green: Color, muted: Color) {
             TextButton(onClick = {
                 val clipboard = context.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                 clipboard.setPrimaryClip(android.content.ClipData.newPlainText("Pixel Capsule widget", text))
-                Toast.makeText(context, capsuleString(R.string.text_copied), Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.text_copied), Toast.LENGTH_SHORT).show()
             }) { Text(capsuleString(R.string.copy), color = green, fontSize = 10.sp) }
             val uri = runCatching { Uri.parse(text) }.getOrNull()
             if (uri?.scheme == "https" || uri?.scheme == "http") {
                 TextButton(onClick = {
                     runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, uri).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) }
-                        .onFailure { Toast.makeText(context, capsuleString(R.string.link_open_failed), Toast.LENGTH_SHORT).show() }
+                        .onFailure { Toast.makeText(context, context.getString(R.string.link_open_failed), Toast.LENGTH_SHORT).show() }
                 }) { Text(capsuleString(R.string.open_link), color = green, fontSize = 10.sp) }
             }
         }
